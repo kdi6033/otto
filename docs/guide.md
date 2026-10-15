@@ -139,8 +139,6 @@ static OttoCalibrationRegister ottoCalibrationRegister;
 
 | 번호 | 이름 | 설명 | 사용 모터 | 주요 튜닝 값 |
 |---|---|---|---|---|
-| 00 | callibration_rolling | 조립 후 다리 수직, 두 바퀴 직진 확인 | YL YR RL RR | YL_PULSE_CENTER, YR_PULSE_CENTER, RL_SPEED_US, RR_SPEED_US |
-| 01 | callibration_walk | 걷기 기울기 맞추기 | YL YR RL RR | TILT_OFFSET_R, TILT_OFFSET_L |
 | 02 | walk_front | 앞으로 걷기 | YL YR RL RR | TILT_OFFSET_R, TILT_OFFSET_L, RL_SPEED_US, RR_SPEED_US |
 | 03 | walk_back | 뒤로 걷기 | YL YR RL RR | TILT_OFFSET_R, TILT_OFFSET_L, RL_SPEED_US, RR_SPEED_US |
 | 04 | walk_left | 걸으면서 왼쪽으로 돌기 | YL YR RL RR | TILT_OFFSET_R, RL_SPEED_US, RR_SPEED_US |
