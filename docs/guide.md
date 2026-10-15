@@ -297,17 +297,19 @@ Otto I2R 로봇이 **앞으로 똑바로 걷게** 하는 프로그램입니다. 
 
 ```c
 #include <OttoI2R.h>
-#include "config.h"   // 보정값이 자동으로 등록된다
 
 // 앞으로 걷기: 오른발 -> 왼발 번갈아 한 걸음씩 내딛는다.
-// 고칠 건 이 폴더의 config.h 뿐이다. (callibration_walk의 config.h를 복사해서 쓴다)
+// 보정값은 웹의 [로봇 맞추기]에서 맞춰 보드에 저장한 값을 쓴다. 
+// 아직 저장하지 않은 보드는 기본값으로 걷는다. 로봇에 따라 안 맞을 수 있으니 먼저 [로봇 맞추기]를 하세요.
 
 void setup() {
+  ottoInit();
 }
 
 void loop() {
   walkFront();
 }
+
 ```
 </details>
 --------
