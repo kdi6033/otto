@@ -43,7 +43,7 @@ Otto I2R는 서보모터 4개로 걷습니다. 이름은 **[관절 종류][좌/�
 | **RL** | Roll Left | 왼쪽 발 | 6 | 360도 연속회전 | 발을 굴려서 실제로 앞으로 내딛음 (걸음을 만드는 동작) |
 | **RR** | Roll Right | 오른쪽 발 | 7 | 360도 연속회전 | 발을 굴려서 실제로 앞으로 내딛음 (걸음을 만드는 동작) |
 
-<img src="../images/otto01.png" height="500">
+<img src="../images/otto-servos-guide.png" alt="Otto 서보모터 이름 (RR, YR, YL, RL)" width="304">
 
 > 이 이름은 Otto DIY 공식 아두이노 라이브러리(`Otto.h`)의 명명 규칙과 동일합니다. 같은 이름을 쓰면 공식 예제 코드와 튜토리얼을 그대로 참고할 수 있어 편리합니다.
 
