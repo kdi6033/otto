@@ -1,5 +1,7 @@
 # Otto I2R Robot
 
+**생성형 AI(Claude, Gemini, ChatGPT 등)와 함께 배우는 피지컬 AI 로봇**
+
 [i2r-05](https://github.com/kdi6033/i2r-05) 보드(ESP32-S3)와 서보모터 4개로 만든 Otto 로봇의 문서 모음입니다.
 
 <img src="images/otto-photo.png" height="450">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/otto-servos.png" height="400">
