@@ -4,8 +4,6 @@
 
 <img src="images/otto-photo.png" height="450">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/otto-servos.png" height="400">
 
-<img src="images/otto01.png" height="400">
-
 ## 서보모터 4개
 
 | 이름 | 위치 | 연결 핀 | 서보 종류 |
