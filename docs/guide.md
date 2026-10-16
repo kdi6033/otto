@@ -287,6 +287,52 @@ void loop() {
 
 ```
 </details>
+
+**속도를 바꿔 가며 걷기 (walk_front_speed)**
+
+로봇이 **느리게 걷기 시작해서 점점 빨라지고, 다시 점점 느려지는** 예제예요.
+
+- `speed`는 속도 숫자를 담는 상자예요. 40에서 시작해서 20씩 커져서 200까지 가요.
+- `for`는 같은 일을 여러 번 되풀이하게 해 줘요. 첫 번째 `for`는 속도를 **올리고**, 두 번째 `for`는 속도를 **내려요**.
+- `walkFront(speed);`를 두 번 써서 속도마다 **두 걸음**씩 걸어요.
+- 시리얼 모니터(115200)를 열면 지금 속도 숫자가 나와요.
+
+로봇이 걷는 속도는 이렇게 바뀌어요.
+
+> 40 → 60 → 80 → 100 → 120 → ... → 200 → 180 → ... → 60 → 40 → (다시 처음부터)
+
+<br>
+<details>
+    <summary>💻 속도를 바꿔 가며 걷기 (walk_front_speed.ino) </summary>
+
+```c
+#include <OttoI2R.h>
+
+// 속도를 바꿔 가며 걷기 (쉬운 버전)
+// walkFront(숫자)는 그 숫자의 속도로 걸어요. 100이 보통 속도, 클수록 빨라요. (40 ~ 200)
+// 느린 속도에서 빠른 속도까지 올라갔다가, 다시 느린 속도까지 내려와요.
+
+void setup() {
+  ottoInit();   // 로봇을 준비해요
+}
+
+void loop() {
+  // 40, 60, 80 ... 200 : 점점 빨라져요
+  for (int speed = 40; speed <= 200; speed = speed + 20) {
+    Serial.println(speed);   // 지금 속도를 보여 줘요
+    walkFront(speed);        // 한 걸음 (오른발, 왼발)
+    walkFront(speed);        // 한 걸음 더
+  }
+
+  // 200, 180, 160 ... 40 : 점점 느려져요
+  for (int speed = 200; speed >= 40; speed = speed - 20) {
+    Serial.println(speed);
+    walkFront(speed);
+    walkFront(speed);
+  }
+}
+```
+</details>
 --------
 
 ### ✅ 3.3 뒤로 걷기 (walk_back)
