@@ -1400,6 +1400,8 @@ void drawSleepingEye(int cx, int cy) {
 
 
 ### ✅ 3.18 LED 프로그램
+<img src="../images/led-ring-16.png" alt="WS2812B 16구 LED 링 (IN, OUT, 5V, G)" width="300">
+
 FastLED 라이브러리 사용하는 그래픽 프로그램
 
 <br>     
