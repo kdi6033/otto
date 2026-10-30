@@ -1226,9 +1226,6 @@ U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE); // I2C / TWI
 본 제품의 기본 I2C주소는 0x3C로 예제코드의 초기화 코드를 아래와 같이 변경하여야 합니다.
 display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // initialize with the I2C addr 0x3C (for the 128x64)
 
-아래 네 프로그램은 **차례대로** 따라 하면 됩니다. 스케치 파일은 GitHub [sketches/oled](https://github.com/kdi6033/otto/tree/main/sketches/oled) 폴더에 있습니다. (`oled_1_hello_world` → `oled_2_hangul` → `oled_3_eyes_move` → `oled_4_eyes_sleep`) 
-Arduino IDE 라이브러리 관리자에서 **U8g2** 를 설치해야 합니다.
-
 
 <br>     
 <details>
