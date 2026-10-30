@@ -1400,7 +1400,7 @@ void drawSleepingEye(int cx, int cy) {
 
 
 ### ✅ 3.18 LED 프로그램
-<img src="../images/led-ring-16.png" alt="WS2812B 16구 LED 링 (IN, OUT, 5V, G)" width="300">
+<img src="../images/led-ring-16.png" alt="WS2812B 16구 LED 링 (IN, OUT, 5V, G)" width="200">
 
 FastLED 라이브러리 사용하는 그래픽 프로그램
 
@@ -1532,7 +1532,7 @@ void flowingEffect() {
 
 ### ✅ 3.19 거리 센서
  VL53L0X Time-of-Flight (ToF) 거리센서를 사용합니다.
-<img src="../images/vl53l0x-distance.png" alt="VL53L0X 거리 센서 모듈 (VIN, GND, SCL, SDA)" width="300">
+<img src="../images/vl53l0x-distance.png" alt="VL53L0X 거리 센서 모듈 (VIN, GND, SCL, SDA)" width="200">
 
 🔍 개요
 VL53L0X는 STMicroelectronics에서 개발한 **레이저 기반 Time-of-Flight(ToF) 거리 센서**입니다.  
