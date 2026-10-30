@@ -91,6 +91,8 @@ Otto를 Arduino IDE로 프로그래밍하려면 **OttoI2R 라이브러리**를 �
 - **추가로 설치할 라이브러리는 없습니다.** 서보는 ESP32 기본 PWM(LEDC)으로 직접 구동합니다.
 - **ESP32 보드 패키지 3.0 이상**이 필요합니다. (보드 매니저에서 `esp32 by Espressif Systems` 3.x 설치)
 
+라이브러리의 사용법과 함수 목록은 [OttoI2R 저장소 README](https://github.com/kdi6033/OttoI2R)를 참조하세요.
+
 -------
 
 ## ✅ 2. 프로젝트 구조
