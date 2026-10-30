@@ -1531,7 +1531,7 @@ void flowingEffect() {
 무지개 속도 조절 → delay(10) 또는 EVERY_N_MILLISECONDS(20)    
 
 ### ✅ 3.19 거리 센서
-<img src="../images/vl53l0x-distance.png" alt="VL53L0X 거리 센서 모듈 (VIN, GND, SCL, SDA)" width="100">    
+<img src="../images/vl53l0x-distance.png" alt="VL53L0X 거리 센서 모듈 (VIN, GND, SCL, SDA)" width="150">    
 
  VL53L0X Time-of-Flight (ToF) 거리센서를 사용합니다.
 
