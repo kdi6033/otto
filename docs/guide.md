@@ -1532,7 +1532,7 @@ void flowingEffect() {
 
 ### ✅ 3.19 거리 센서
  VL53L0X Time-of-Flight (ToF) 거리센서를 사용합니다.
-<img src="https://github.com/user-attachments/assets/1e3b3bde-cb82-42ad-af43-7e03a7ce1e27" alt="VL53L0X" width="300">
+<img src="../images/vl53l0x-distance.png" alt="VL53L0X 거리 센서 모듈 (VIN, GND, SCL, SDA)" width="300">
 
 🔍 개요
 VL53L0X는 STMicroelectronics에서 개발한 **레이저 기반 Time-of-Flight(ToF) 거리 센서**입니다.  
