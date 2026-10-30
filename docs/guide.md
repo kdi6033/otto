@@ -1207,6 +1207,8 @@ void loop() {
 
 ----
 ### ✅ 3.17 1.3" OLED LCD 128x64
+<img src="../images/oled-1.3-128x64.png" alt="1.3인치 OLED LCD 128x64 (SH1106, I2C 4핀)" width="400">
+
 - Resolution: 128*64
 - Control chip: SH1106
 - Display area: 29.42 x 14.7mm
