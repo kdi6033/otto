@@ -355,6 +355,153 @@ void loop() {
 2. 펄스폭을 칸 수로 바꾸는 계산(`us x 16384 / 20000`)을 직접 해 보면 PWM의 원리가 보입니다.
 3. OttoI2R의 `moveHip(yr, yl)`은 이 모든 과정을 묶어서 **각도만 넣으면 움직이도록** 만든 함수입니다.
 
+#### 1.3.5 예제로 따라 해 보기: RR 서보(360도) 돌리기
+
+이번에는 **360도 서보**입니다. Otto의 **오른발 서보(RR, GPIO 7번)** 를 속도를 바꿔 가며 돌려 봅니다. 1.3.4와 같이 두 방법으로 만듭니다.
+
+> ⚠️ 발이 바퀴처럼 굴러가므로 **로봇을 바닥에 놓지 말고 손으로 들거나, 서보만 따로 꺼내서** 시험하세요.
+
+**① 펄스폭을 직접 보내기 (`servo_rr`)**
+
+360도 서보는 펄스폭이 **속도와 방향**입니다. 1.5ms가 정지이고, 멀어질수록 빨라집니다.
+
+```cpp
+const int PIN_RR = 7;    // RR 서보 신호선 (GPIO 7)
+
+// 펄스폭(마이크로초, us). 1ms = 1000us
+const int T_FAST_A = 500;   // 0.5ms -> 한쪽 방향 최고 속도
+const int T_SLOW_A = 1000;  // 1.0ms -> 한쪽 방향 느리게
+const int T_STOP = 1500;    // 1.5ms -> 정지
+const int T_SLOW_B = 2000;  // 2.0ms -> 반대 방향 느리게
+const int T_FAST_B = 2500;  // 2.5ms -> 반대 방향 최고 속도
+
+// 펄스폭(us)을 서보에 내보낸다. (1.3.4의 servoWriteUs 와 같다)
+void servoWriteUs(int pin, int us) {
+  ledcWrite(pin, (uint32_t)us * 16384 / 20000);
+}
+
+void setup() {
+  Serial.begin(115200);
+  ledcAttach(PIN_RR, 50, 14);   // 핀, 50Hz(20ms 주기), 14비트
+  servoWriteUs(PIN_RR, T_STOP); // 시작할 때는 정지
+}
+
+void loop() {
+  Serial.println("0.5ms -> 한쪽 방향 최고 속도");
+  servoWriteUs(PIN_RR, T_FAST_A);
+  delay(2000);
+
+  Serial.println("1.0ms -> 한쪽 방향 느리게");
+  servoWriteUs(PIN_RR, T_SLOW_A);
+  delay(2000);
+
+  Serial.println("1.5ms -> 정지");
+  servoWriteUs(PIN_RR, T_STOP);
+  delay(2000);
+
+  Serial.println("2.0ms -> 반대 방향 느리게");
+  servoWriteUs(PIN_RR, T_SLOW_B);
+  delay(2000);
+
+  Serial.println("2.5ms -> 반대 방향 최고 속도");
+  servoWriteUs(PIN_RR, T_FAST_B);
+  delay(2000);
+
+  Serial.println("1.5ms -> 정지");
+  servoWriteUs(PIN_RR, T_STOP);
+  delay(2000);
+}
+```
+
+1.3.4의 YL 예제와 **다른 곳은 숫자의 뜻뿐**입니다. 코드 구조(`ledcAttach`, `servoWriteUs`)는 똑같고, 180도 서보에서는 각도였던 펄스폭이 여기서는 속도와 방향이 됩니다.
+
+> 서보마다 정지 값이 1.5ms에서 조금 벗어나 있습니다. **1.5ms인데 천천히 돈다면** `T_STOP`을 1450이나 1550처럼 바꿔서 멈추는 값을 찾으세요.
+
+**② OttoI2R 라이브러리로 속도 넣기 (`servo_rr_otto`)**
+
+```cpp
+#include <OttoI2R.h>
+
+void setup() {
+  Serial.begin(115200);
+}
+
+void loop() {
+  Serial.println("앞으로 최고 속도 (400)");
+  rollRightFoot(400);
+  delay(2000);
+
+  Serial.println("앞으로 느리게 (200)");
+  rollRightFoot(200);
+  delay(2000);
+
+  Serial.println("정지 (0)");
+  rollRightFoot(0);
+  delay(2000);
+
+  Serial.println("뒤로 느리게 (-200)");
+  rollRightFoot(-200);
+  delay(2000);
+
+  Serial.println("뒤로 최고 속도 (-400)");
+  rollRightFoot(-400);
+  delay(2000);
+
+  Serial.println("정지 (0)");
+  rollRightFoot(0);
+  delay(2000);
+}
+```
+
+라이브러리에는 발을 **속도로** 굴리는 함수가 세 개 있습니다.
+
+| 함수 | 하는 일 |
+|---|---|
+| `rollRightFoot(speed)` | 오른발(RR)만 굴립니다. |
+| `rollLeftFoot(speed)` | 왼발(RL)만 굴립니다. |
+| `ottoRollFeet(rr, rl)` | 두 발의 속도를 한 번에 정합니다. |
+
+- 속도는 **-400 ~ 400**입니다. **양수는 앞으로, 음수는 뒤로, 0은 정지**입니다. 범위를 넘으면 자동으로 한계 값으로 바뀝니다.
+- 서보 준비(`ledcAttach` 등)는 처음 부를 때 라이브러리가 알아서 합니다.
+- 오른발과 왼발은 서보가 거울처럼 반대로 달려 있습니다. 그래서 펄스폭으로 직접 돌리면 한쪽이 거꾸로 가지만, 라이브러리는 **양쪽 모두 양수가 "앞으로"** 가 되도록 방향을 맞춰 줍니다.
+
+**속도가 펄스폭으로 바뀌는 과정**
+
+라이브러리 안에서는 속도를 이렇게 펄스폭으로 바꿉니다. (오른발 기준, 정지는 1500us)
+
+```
+펄스폭(us) = 1500 - speed
+```
+
+| `rollRightFoot(speed)` | 펄스폭 |
+|---|---|
+| 400 | 1100us (1.1ms) |
+| 200 | 1300us (1.3ms) |
+| 0 | 1500us (1.5ms), 정지 |
+| -200 | 1700us (1.7ms) |
+| -400 | 1900us (1.9ms) |
+
+**두 방법 비교**
+
+| | ① 펄스폭 직접 | ② `rollRightFoot` |
+|---|---|---|
+| 서보 준비 | `ledcAttach(7, 50, 14)` 직접 | 라이브러리가 자동으로 |
+| 돌리기 | 펄스폭을 계산해서 `ledcWrite` | `rollRightFoot(200)` 한 줄 |
+| 값의 단위 | 펄스폭 (us) | 속도 (-400 ~ 400) |
+| 방향 | 오른발과 왼발이 반대 (직접 생각) | 양쪽 모두 양수 = 앞으로 |
+| 최고 속도 | 0.5ms / 2.5ms (서보 끝값) | 1.1ms / 1.9ms (안전하게 제한) |
+| 용도 | 원리를 이해할 때 | 로봇을 움직일 때 |
+
+> ⚠️ 두 예제의 **방향은 같다고 보장하지 않습니다.** ①의 0.5ms가 어느 쪽인지와 ②의 "앞으로"는 다를 수 있으니, 직접 돌려서 확인하세요.
+>
+> `rollRightFoot`의 정지 값은 1500us로 고정입니다. 서보가 어긋나 있어서 0인데도 천천히 돈다면, 라이브러리의 로봇 맞추기(3.1) 값은 걷기 같은 동작에 쓰이고 이 함수의 정지 값에는 반영되지 않는다는 점을 기억하세요.
+
+**정리**
+
+1. 360도 서보도 신호선과 코드 구조는 180도 서보와 같고, 펄스폭의 **뜻만 다릅니다.** 1.5ms가 정지, 멀어질수록 빠릅니다.
+2. OttoI2R의 `rollRightFoot(speed)`, `rollLeftFoot(speed)`, `ottoRollFeet(rr, rl)`은 **속도만 넣으면** 펄스폭 계산과 좌우 방향 맞추기를 대신 해 주는 함수입니다.
+3. 원리를 이해할 때는 ①, 로봇을 움직일 때는 ②를 씁니다.
+
 -------
 
 ## ✅ 2. 프로젝트 구조
