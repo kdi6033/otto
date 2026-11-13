@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 290" font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#d97706"/></linearGradient>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="135%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.15"/>
+    </filter>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="290" rx="20" fill="url(#bg)"/>
+  <text x="450" y="42" text-anchor="middle" font-size="26" font-weight="700" fill="#0f172a">접속 순서 4단계</text>
+
+  <!-- 카드 1 -->
+  <g filter="url(#sh)">
+    <rect x="25" y="70" width="195" height="185" rx="18" fill="#ffffff"/>
+  </g>
+  <circle cx="122" cy="70" r="24" fill="url(#g1)"/>
+  <text x="122" y="79" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">1</text>
+  <text x="122" y="132" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Wi-Fi 정보 입력</text>
+  <text x="122" y="168" text-anchor="middle" font-size="14" fill="#475569">스케치에</text>
+  <text x="122" y="190" text-anchor="middle" font-size="14" fill="#475569">공유기 이름 · 비밀번호</text>
+  <rect x="62" y="212" width="120" height="24" rx="12" fill="#ffedd5"/>
+  <text x="122" y="229" text-anchor="middle" font-size="12" font-family="Consolas,monospace" font-weight="700" fill="#c2410c">WIFI_SSID</text>
+
+  <!-- 카드 2 -->
+  <g filter="url(#sh)">
+    <rect x="250" y="70" width="195" height="185" rx="18" fill="#ffffff"/>
+  </g>
+  <circle cx="347" cy="70" r="24" fill="url(#g2)"/>
+  <text x="347" y="79" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">2</text>
+  <text x="347" y="132" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">업로드</text>
+  <text x="347" y="168" text-anchor="middle" font-size="14" fill="#475569">Otto에 올리고</text>
+  <text x="347" y="190" text-anchor="middle" font-size="14" fill="#475569">건전지 전원 연결</text>
+  <rect x="287" y="212" width="120" height="24" rx="12" fill="#fef3c7"/>
+  <text x="347" y="229" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">otto_web_walk.ino</text>
+
+  <!-- 카드 3 -->
+  <g filter="url(#sh)">
+    <rect x="475" y="70" width="195" height="185" rx="18" fill="#ffffff"/>
+  </g>
+  <circle cx="572" cy="70" r="24" fill="url(#g3)"/>
+  <text x="572" y="79" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">3</text>
+  <text x="572" y="132" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">주소 확인</text>
+  <text x="572" y="168" text-anchor="middle" font-size="14" fill="#475569">시리얼 모니터(115200)에서</text>
+  <text x="572" y="190" text-anchor="middle" font-size="14" fill="#475569">주소를 확인</text>
+  <rect x="502" y="212" width="140" height="24" rx="12" fill="#ede9fe"/>
+  <text x="572" y="229" text-anchor="middle" font-size="12" font-family="Consolas,monospace" font-weight="700" fill="#6d28d9">http://192.168.0.xx</text>
+
+  <!-- 카드 4 -->
+  <g filter="url(#sh)">
+    <rect x="700" y="70" width="175" height="185" rx="18" fill="#ffffff"/>
+  </g>
+  <circle cx="787" cy="70" r="24" fill="url(#g4)"/>
+  <text x="787" y="79" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">4</text>
+  <text x="787" y="132" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">접속</text>
+  <text x="787" y="168" text-anchor="middle" font-size="14" fill="#475569">같은 Wi-Fi에서</text>
+  <text x="787" y="190" text-anchor="middle" font-size="14" fill="#475569">브라우저에 주소 입력</text>
+  <rect x="737" y="212" width="100" height="24" rx="12" fill="#dbeafe"/>
+  <text x="787" y="229" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">완료!</text>
+
+  <!-- 화살표 -->
+  <g stroke="#94a3b8" stroke-width="3" stroke-linecap="round">
+    <line x1="224" y1="162" x2="246" y2="162" marker-end="url(#ar)"/>
+    <line x1="449" y1="162" x2="471" y2="162" marker-end="url(#ar)"/>
+    <line x1="674" y1="162" x2="696" y2="162" marker-end="url(#ar)"/>
+  </g>
+</svg>

@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+    <linearGradient id="gRouter" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="gOtto" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fb923c"/>
+      <stop offset="1" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="gMe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="135%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+    <marker id="aBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="aOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="480" rx="20" fill="url(#bg)"/>
+
+  <text x="450" y="46" text-anchor="middle" font-size="26" font-weight="700" fill="#0f172a">Otto가 홈페이지를 열고, 나는 같은 Wi-Fi로 접속한다</text>
+  <text x="450" y="72" text-anchor="middle" font-size="15" fill="#64748b">클라우드 서버도, 인터넷도 필요 없습니다</text>
+
+  <!-- 인터넷 (점선) -->
+  <line x1="545" y1="130" x2="690" y2="130" stroke="#cbd5e1" stroke-width="3" stroke-dasharray="6 6"/>
+  <rect x="690" y="106" width="150" height="48" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="765" y="127" text-anchor="middle" font-size="14" font-weight="700" fill="#94a3b8">인터넷</text>
+  <text x="765" y="144" text-anchor="middle" font-size="12" fill="#94a3b8">없어도 동작</text>
+
+  <!-- 공유기 -->
+  <g filter="url(#sh)">
+    <rect x="335" y="98" width="210" height="76" rx="18" fill="url(#gRouter)"/>
+  </g>
+  <!-- 안테나 -->
+  <g stroke="#047857" stroke-width="5" stroke-linecap="round">
+    <line x1="365" y1="98" x2="355" y2="78"/>
+    <line x1="515" y1="98" x2="525" y2="78"/>
+  </g>
+  <!-- LED -->
+  <g fill="#bbf7d0">
+    <circle cx="362" cy="158" r="4"/><circle cx="378" cy="158" r="4"/><circle cx="394" cy="158" r="4"/>
+  </g>
+  <!-- Wi-Fi 아이콘 -->
+  <g fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round">
+    <path d="M388 130 Q410 112 432 130" opacity="0.55"/>
+    <path d="M396 140 Q410 128 424 140" opacity="0.8"/>
+  </g>
+  <circle cx="410" cy="148" r="4" fill="#ffffff"/>
+  <text x="490" y="128" text-anchor="middle" font-size="19" font-weight="700" fill="#ffffff">ipTIME</text>
+  <text x="490" y="150" text-anchor="middle" font-size="13" fill="#d1fae5">공유기 · 같은 Wi-Fi</text>
+
+  <!-- Otto 카드 -->
+  <g filter="url(#sh)">
+    <rect x="50" y="250" width="300" height="190" rx="22" fill="#ffffff"/>
+    <rect x="50" y="250" width="300" height="56" rx="22" fill="url(#gOtto)"/>
+    <rect x="50" y="284" width="300" height="22" fill="url(#gOtto)"/>
+  </g>
+  <text x="200" y="287" text-anchor="middle" font-size="21" font-weight="700" fill="#ffffff">Otto 로봇</text>
+  <rect x="78" y="324" width="244" height="94" rx="14" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="200" y="354" text-anchor="middle" font-size="16" font-weight="700" fill="#c2410c">홈페이지 (웹서버)</text>
+  <text x="200" y="379" text-anchor="middle" font-size="14" fill="#475569">조종 화면을 보내 주고</text>
+  <text x="200" y="400" text-anchor="middle" font-size="14" fill="#475569">명령을 받아 움직입니다</text>
+
+  <!-- 나 카드 -->
+  <g filter="url(#sh)">
+    <rect x="550" y="250" width="300" height="190" rx="22" fill="#ffffff"/>
+    <rect x="550" y="250" width="300" height="56" rx="22" fill="url(#gMe)"/>
+    <rect x="550" y="284" width="300" height="22" fill="url(#gMe)"/>
+  </g>
+  <text x="700" y="287" text-anchor="middle" font-size="21" font-weight="700" fill="#ffffff">나 (휴대폰 · PC)</text>
+  <rect x="578" y="324" width="244" height="94" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="700" y="354" text-anchor="middle" font-size="16" font-weight="700" fill="#1d4ed8">브라우저</text>
+  <text x="700" y="379" text-anchor="middle" font-size="14" font-family="Consolas,monospace" fill="#475569">http://192.168.0.xx</text>
+  <text x="700" y="400" text-anchor="middle" font-size="14" fill="#475569">상태 보기 · 버튼 누르기</text>
+
+  <!-- 공유기 연결선 -->
+  <g stroke="#10b981" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M335 150 Q200 150 200 245"/>
+    <path d="M545 150 Q700 150 700 245"/>
+  </g>
+  <circle cx="200" cy="245" r="6" fill="#10b981"/>
+  <circle cx="700" cy="245" r="6" fill="#10b981"/>
+
+  <!-- 주고받는 것 -->
+  <line x1="365" y1="334" x2="535" y2="334" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#aBlue)"/>
+  <rect x="373" y="296" width="154" height="28" rx="14" fill="#dbeafe"/>
+  <text x="450" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">화면 · 상태 (모니터링)</text>
+
+  <line x1="535" y1="388" x2="365" y2="388" stroke="#ea580c" stroke-width="4" stroke-linecap="round" marker-end="url(#aOrange)"/>
+  <rect x="373" y="398" width="154" height="28" rx="14" fill="#ffedd5"/>
+  <text x="450" y="417" text-anchor="middle" font-size="13" font-weight="700" fill="#c2410c">명령 /walk?v=100 (제어)</text>
+</svg>
