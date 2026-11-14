@@ -75,6 +75,8 @@
 
 ### 방법 B: Claude Code로 하기 (중급용, AI가 업로드까지)
 
+[![유튜브 보기](https://img.shields.io/badge/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EB%B3%B4%EA%B8%B0-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/2xssJmEde6o) [**전문가의 지식을 통째로 넣어 AI 프로그램**](https://youtu.be/2xssJmEde6o)
+
 내가 설치하는 것은 **Git, VS Code, Claude Code 확장** 3개뿐입니다. 빈 폴더를 VS Code로 열고 Claude에게 아래처럼 말하면, 저장소 내려받기와 컴파일 도구·라이브러리 설치까지 Claude가 합니다.
 
 ```
