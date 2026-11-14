@@ -95,7 +95,7 @@ Otto를 Arduino IDE로 프로그래밍하려면 **OttoI2R 라이브러리**를 �
 
 1. Arduino IDE 왼쪽의 **라이브러리 관리자**(책 모양 아이콘)를 엽니다. (또는 **스케치 → 라이브러리 포함하기 → 라이브러리 관리**)
 2. 검색창에 `OttoI2R`을 입력합니다.
-3. **OttoI2R by i2r**의 **INSTALL**을 누릅니다. 설치되면 `1.0.0 installed`로 바뀝니다.
+3. **OttoI2R by i2r**의 **INSTALL**을 누릅니다. 설치되면 `INSTALLED`로 표시됩니다.
 
 <img src="../images/otto-arduino-lib.png" alt="Arduino IDE 라이브러리 관리자에서 OttoI2R 설치" width="300">
 
@@ -2287,7 +2287,7 @@ FastLED 라이브러리 사용하는 그래픽 프로그램
 #include <FastLED.h>
 
 #define NUM_LEDS 16
-#define DATA_PIN 9
+#define DATA_PIN 1   // LED 링 데이터 핀 (GP01)
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
 
@@ -2338,7 +2338,7 @@ void loop() {
 #include <FastLED.h>
 
 #define NUM_LEDS 16       // LED 개수
-#define DATA_PIN 9        // 데이터 핀 (D9)
+#define DATA_PIN 1        // 데이터 핀 (GP01)
 #define LED_TYPE WS2812B  // LED 종류
 #define COLOR_ORDER GRB   // 색 순서
 
@@ -2522,7 +2522,7 @@ int directionX = 1, directionY = 1;
 
 // ------------------- FastLED ---------------------
 #define NUM_LEDS 16
-#define DATA_PIN 9
+#define DATA_PIN 1   // LED 링 데이터 핀 (GP01)
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];

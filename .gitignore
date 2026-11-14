@@ -1,0 +1,15 @@
+# 비밀 값 (Wi-Fi 비밀번호, API 키) - 절대 GitHub에 올리지 않음
+secrets.h
+**/secrets.h
+
+# 빌드 결과물
+build/
+**/build/
+*.bin
+*.elf
+*.map
+
+# 편집기, OS
+.vscode/
+.DS_Store
+Thumbs.db

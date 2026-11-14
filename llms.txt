@@ -1,0 +1,41 @@
+# Otto I2R Robot
+
+> ESP32-S3 보드(i2r-05)와 서보 4개로 만든 교육용 걷는 로봇. Arduino(OttoI2R 라이브러리)로 프로그램한다. 생성형 AI(Claude, ChatGPT, Gemini)와 함께 프로그램하도록 만든 문서 저장소다.
+
+AI가 코드를 만들기 전에 꼭 알아야 할 요약:
+
+- 서보: YL=GPIO4(왼쪽 엉덩이, 180도), YR=GPIO5(오른쪽 엉덩이, 180도), RL=GPIO6(왼발, 360도), RR=GPIO7(오른발, 360도)
+- `#include <OttoI2R.h>` 후 `setup()` 첫 줄에 `ottoInit();` (보드에 저장된 보정값을 불러오고 Serial 115200 시작). 보정값을 코드에 숫자로 넣지 않는다.
+- 동작 함수: walkFront(v), walkBack(v), walkLeft(), walkRight(), slideFront/Back/Left/Right(), rollingFront(v), rollingBack(v), rollingLeft(), rollingRight(), moveHip(yr, yl), ottoRollFeet(rr, rl), rollRightFoot(s), rollLeftFoot(s), dance()
+- 범위: v=20~200(100 기본), 발 속도 -400~400(0 멈춤), 엉덩이 YR 0~135 / YL 55~180(90 가운데). rolling* 은 계속 돌므로 ottoRollFeet(0,0)으로 멈춘다.
+- ESP32Servo 라이브러리를 쓰지 않는다(충돌). 서보 핀에 ledcAttach/Servo.attach를 직접 쓰지 않는다.
+- LED 링 WS2812B 16개 = GPIO1 (FastLED). I2C SDA=18, SCL=17: OLED SH1106(U8g2), VL53L0X 거리센서, BH1750 조도센서.
+- 스피커 MAX98357A: BCLK 12, LRCLK 11, DIN 13, SD_MODE 14(HIGH=켜기). 마이크 INMP441: SCK 8, WS 10, SD 9. 배터리 전압: GPIO15 x 5.7. 스위치 SW3: GPIO16(누르면 LOW).
+- 보드: ESP32S3 Dev Module, USB CDC On Boot=Enabled, Flash 16MB, PSRAM OPI, Partition "16M Flash (3MB APP/9.9MB FATFS)", Erase All Flash=Disabled. esp32 보드 패키지 3.0 이상.
+- 걷다 재부팅되면 코드보다 전원(배터리) 부족을 먼저 의심한다.
+- 사용자는 초보자다. 한국어로, 전체 코드를 주고, 한 번에 한 기능씩.
+
+## 핵심 문서
+
+- [AGENTS.md (AI용 전체 규칙과 함수 목록)](https://raw.githubusercontent.com/kdi6033/otto/main/AGENTS.md): 코드를 만들기 전에 가장 먼저 읽을 파일
+- [제작 가이드](https://raw.githubusercontent.com/kdi6033/otto/main/docs/guide.md): 사람용 설명, 회로, 보정 방법, 예제 해설 (길다)
+- [OttoI2R 라이브러리 헤더](https://raw.githubusercontent.com/kdi6033/OttoI2R/main/src/OttoI2R.h): 함수 선언과 주석
+
+## 예제
+
+- [앞으로 걷기](https://raw.githubusercontent.com/kdi6033/OttoI2R/main/examples/walk_front/walk_front.ino)
+- [속도 바꿔 걷기](https://raw.githubusercontent.com/kdi6033/OttoI2R/main/examples/walk_front_speed/walk_front_speed.ino)
+- [앞으로 굴리기](https://raw.githubusercontent.com/kdi6033/OttoI2R/main/examples/rolling_front/rolling_front.ino)
+- [엉덩이 각도](https://raw.githubusercontent.com/kdi6033/OttoI2R/main/examples/hip_move/hip_move.ino)
+- [댄스](https://raw.githubusercontent.com/kdi6033/OttoI2R/main/examples/dance/dance.ino)
+- [LED 링](https://raw.githubusercontent.com/kdi6033/otto/main/examples/led_effects/led_effects.ino)
+- [OLED 눈](https://raw.githubusercontent.com/kdi6033/otto/main/examples/oled_eyes/oled_eyes.ino)
+- [거리 센서](https://raw.githubusercontent.com/kdi6033/otto/main/examples/distance_vl53l0x/distance_vl53l0x.ino)
+- [OLED + 거리 센서 + LED](https://raw.githubusercontent.com/kdi6033/otto/main/examples/face_sensor_led/face_sensor_led.ino)
+- [휴대폰으로 걷기 속도 조절(웹서버)](https://raw.githubusercontent.com/kdi6033/otto/main/examples/otto_web_walk/otto_web_walk.ino)
+
+## Optional
+
+- [통신 프로토콜 (MQTT, BLE)](https://raw.githubusercontent.com/kdi6033/otto/main/docs/protocol.md)
+- [Claude Code로 시작하기](https://raw.githubusercontent.com/kdi6033/otto/main/docs/claude-code.md)
+- [라이브러리 전체 예제 목록](https://github.com/kdi6033/OttoI2R/tree/main/examples)
