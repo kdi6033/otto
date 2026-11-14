@@ -89,6 +89,8 @@ Otto에는 서로 다른 일을 하는 보드가 2개 들어갑니다. 회로도
 
 ### ✅ 1.2 Otto I2R Robot 아두이노 라이브러리 설치
 
+[![유튜브 보기](https://img.shields.io/badge/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EB%B3%B4%EA%B8%B0-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/KlRC2fl1cKY) [**로봇 아두이노 라이브러리 설치 및 코딩**](https://youtu.be/KlRC2fl1cKY)
+
 Otto를 Arduino IDE로 프로그래밍하려면 **OttoI2R 라이브러리**를 설치합니다. 라이브러리 관리자에서 설치하는 방법이 가장 쉽습니다.
 
 **방법 1. Arduino IDE 라이브러리 관리자 (권장)**
