@@ -117,6 +117,8 @@ Otto를 Arduino IDE로 프로그래밍하려면 **OttoI2R 라이브러리**를 �
 
 ### ✅ 1.3 서보모터의 원리와 프로그램
 
+[![유튜브 보기](https://img.shields.io/badge/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EB%B3%B4%EA%B8%B0-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/5cQKR86WznM) [**서보모터의 이해와 아두이노 프로그램**](https://youtu.be/5cQKR86WznM)
+
 Otto의 다리와 발은 **서보모터**로 움직입니다. 여기서는 서보모터 **1개**를 어떻게 움직이는지, 그 원리부터 알아봅니다. 설명에 쓰는 서보모터는 Otto에 들어가는 **SG90 (Micro Servo 9g)** 입니다.
 
 #### 1.3.1 서보모터 안에는 무엇이 들어 있을까?
