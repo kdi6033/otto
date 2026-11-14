@@ -847,7 +847,7 @@ void loop() {
    const char *WIFI_PASS = "비밀번호";
    ```
 2. Otto에 업로드하고, 건전지 전원을 연결합니다.
-3. 시리얼 모니터(115200)에서 `주소: http://192.168.0.xx`를 확인합니다.
+3. Otto의 **OLED 화면**(또는 시리얼 모니터 115200)에서 주소 `http://192.168.0.xx`를 확인합니다.
 4. 휴대폰을 **같은 공유기 Wi-Fi**에 연결하고, 브라우저에 그 주소를 입력합니다.
 
 **주의할 점**
@@ -874,7 +874,7 @@ void loop() {
   [정지]           /walk?v=0        바로 멈추기
 ```
 
-1. Otto가 공유기에 접속하고, 자기 주소(IP)를 시리얼 모니터에 보여 줘요.
+1. Otto가 공유기에 접속하고, 자기 주소(IP)를 OLED 화면과 시리얼 모니터에 보여 줘요.
 2. 브라우저에서 그 주소를 열면 Otto가 조종판 화면(HTML)을 보내 줘요. 화면도 로봇 안에 들어 있어요.
 3. 원을 누르면 화면이 `/walk?v=속도`라는 주소로 속도를 보내고, Otto는 그 속도로 `walkFront(속도)`를 계속 불러요.
 
@@ -886,11 +886,19 @@ void loop() {
    const char *WIFI_PASS = "비밀번호";     // 공유기 비밀번호
    ```
    > ⚠️ ESP32는 **2.4GHz Wi-Fi만** 접속할 수 있어요. 이름 끝에 `_5G`가 붙은 Wi-Fi는 안 돼요.
-2. 업로드한 뒤 시리얼 모니터(115200)를 열면 로봇의 주소가 나와요.
+2. 업로드하면 로봇의 **OLED 화면**에 접속할 주소가 나와요. PC가 없어도 화면만 보고 접속할 수 있어요.
+   ```
+   Open in browser:
+   192.168.0.52          ← 이 주소를 열어요 (크게 표시)
+   WiFi: iptime
+   otto-xxxx.local
+   ```
+   시리얼 모니터(115200)에도 같은 내용이 나와요.
    ```
    공유기 'iptime' 에 접속 중......
    공유기 접속 성공
    주소: http://192.168.0.52
+   이름 주소: http://otto-xxxx.local
    ```
 3. **같은 공유기에 접속한** 휴대폰이나 PC의 브라우저에서 그 주소(예: `http://192.168.0.52`)를 열어요.
 
@@ -898,7 +906,7 @@ void loop() {
 
 15초 동안 공유기에 접속하지 못하면(비밀번호가 틀렸거나 공유기가 없을 때) Otto가 **직접 Wi-Fi를 만들어요.**
 
-- Wi-Fi 이름: `Otto-XXXX` (시리얼 모니터에 나와요)
+- Wi-Fi 이름: `Otto-XXXX` (OLED 화면과 시리얼 모니터에 나와요)
 - 비밀번호: `12345678`
 - 휴대폰을 이 Wi-Fi에 연결하면 조종판 화면이 자동으로 떠요. 안 뜨면 브라우저에서 `http://192.168.4.1`을 열어요.
 - "인터넷 연결 없음"이라는 안내가 나오면 **연결 유지**를 눌러요.
@@ -909,7 +917,8 @@ void loop() {
 |---|---|
 | 브라우저에 "사이트에 연결할 수 없음" | 휴대폰/PC가 **로봇과 같은 공유기**에 연결돼 있나요? PC가 유선으로 다른 네트워크에 있거나 Wi-Fi가 꺼져 있으면 접속할 수 없어요. |
 | 시리얼에 "공유기 접속 실패" | 공유기 이름과 비밀번호를 다시 확인하고, 2.4GHz Wi-Fi인지 확인해요. |
-| 어제와 주소가 달라요 | 공유기가 주소를 바꿔 줄 수 있어요. 시리얼 모니터에서 새 주소를 확인해요. |
+| 어제와 주소가 달라요 | 공유기가 주소를 바꿔 줄 수 있어요. OLED 화면에서 새 주소를 확인해요. |
+| OLED에 `Connecting...`만 계속 보여요 | 공유기에 접속하는 중이에요. 15초가 지나도 안 되면 Otto가 직접 Wi-Fi를 만들고 그 이름과 비밀번호를 보여 줘요. |
 | 걷다가 저절로 멈춰요 | 휴대폰 화면이 꺼지면 3초 뒤 안전하게 멈춰요. 건전지가 약해도 멈출 수 있어요. |
 
 > 💡 **안전 장치:** 화면이 3초 넘게 신호를 보내지 않으면(휴대폰 화면 꺼짐, Wi-Fi 끊김) 로봇이 스스로 멈춰요.<br>
@@ -923,7 +932,8 @@ void loop() {
 | `handleWalk()` | `/walk?v=속도` 주소로 들어온 속도를 받아요. 0이면 바로 멈춰요. |
 | `walkTask()` | 받은 속도로 `walkFront(속도)`를 계속 불러요. 한 걸음에 약 1초가 걸리니, 그동안에도 화면 명령을 받을 수 있게 따로 돌려요. |
 | `stopNow()` | 걷던 걸음을 끊고 두 발을 멈추고 다리를 가운데(90도)로 돌려놓아요. |
-| `setup()` | 공유기에 접속하고(실패하면 Wi-Fi 만들기), 웹서버를 시작해요. |
+| `showLcd()` | OLED에 네 줄을 써요. 둘째 줄(접속 주소)은 굵고 크게 보여 줘요. OLED 사용법은 [3.17](#-317-13-oled-lcd-128x64)을 보세요. |
+| `setup()` | OLED를 켜고, 공유기에 접속하고(실패하면 Wi-Fi 만들기), 접속 주소를 OLED에 보여 준 뒤 웹서버를 시작해요. |
 
 > 💡 **도전해 보세요!** 화면의 `후진` 영역을 누르면 `walkBack(속도)`로 뒤로 걷게 바꿔 보세요. 화면(`PAGE`)에서 속도를 음수로 보내고, `walkTask()`에서 음수면 `walkBack()`을 부르게 하면 돼요.
 
@@ -932,11 +942,11 @@ void loop() {
     <summary>💻 휴대폰으로 걷는 속도 조절하기 (otto_web_walk.ino) </summary>
 
 ```c
-// Otto 웹 걷기: Otto 안에 웹서버를 만들고, 휴대폰/PC 브라우저로 전진 속도를 조절한다.
+// Otto 웹 걷기: 인터넷 없이 Otto 가 직접 Wi-Fi 를 만들고, 휴대폰/PC 브라우저로 전진 속도를 조절한다.
 //
 // 사용법
 //  1. 아래 WIFI_SSID, WIFI_PASS 에 공유기(ipTIME 등) 이름과 비밀번호를 넣고 업로드한다.
-//  2. 시리얼 모니터(115200)에 나온 주소(예: http://192.168.0.37)를 같은 공유기에 접속한
+//  2. OLED 화면이나 시리얼 모니터(115200)에 나온 주소(예: http://192.168.0.37)를 같은 공유기에 접속한
 //     휴대폰/PC 브라우저에서 연다. http://otto-xxxx.local 처럼 이름으로도 열 수 있다(안드로이드는 안 될 수 있음).
 //  * 공유기 접속에 실패하면 Otto 가 직접 Wi-Fi "Otto-XXXX"(비밀번호 AP_PASS)를 만든다.
 //    그 Wi-Fi 에 접속하면 화면이 자동으로 뜨고, 안 뜨면 http://192.168.4.1 을 연다.
@@ -955,7 +965,25 @@ void loop() {
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <ESPmDNS.h>
+#include <Wire.h>
+#include <U8g2lib.h>
 #include <OttoI2R.h>
+
+// 1.3" OLED (SH1106, I2C: SDA=18, SCL=17) 에 접속 주소를 보여 준다 (가이드 3.17)
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+
+// OLED 에 네 줄을 쓴다: 제목(작게), 주소(크게), 아래 두 줄(작게)
+void showLcd(const String &title, const String &big, const String &line3, const String &line4) {
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.drawStr(0, 10, title.c_str());
+  u8g2.setFont(u8g2_font_7x13B_tf);   // 주소는 굵고 크게 (IP 15자까지 한 줄)
+  u8g2.drawStr(0, 30, big.c_str());
+  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.drawStr(0, 48, line3.c_str());
+  u8g2.drawStr(0, 62, line4.c_str());
+  u8g2.sendBuffer();
+}
 
 // ▼ 공유기 정보를 여기에 넣는다
 const char *WIFI_SSID = "공유기이름";   // 공유기 이름 (SSID)
@@ -1159,6 +1187,10 @@ void setup() {
   Serial.begin(115200);
   ottoInit();  // 저장된 보정값을 읽고 다리를 가운데로
 
+  Wire.begin(18, 17);  // OLED I2C: SDA=18, SCL=17
+  u8g2.begin();
+  showLcd("Otto Web Walk", "Connecting...", String("WiFi: ") + WIFI_SSID, "");
+
   // 이름 끝 4글자는 보드마다 다르다 (MAC 주소). Wi-Fi 이름과 .local 이름에 쓴다
   String mac = WiFi.macAddress();
   mac.replace(":", "");
@@ -1185,6 +1217,7 @@ void setup() {
     Serial.println("공유기 접속 성공");
     Serial.println("주소: http://" + ip.toString());
     Serial.println("이름 주소: http://" + host + ".local");
+    showLcd("Open in browser:", ip.toString(), String("WiFi: ") + WIFI_SSID, host + ".local");
   } else {
     // 2) 실패하면 Otto 가 직접 Wi-Fi 를 만든다
     apMode = true;
@@ -1199,6 +1232,8 @@ void setup() {
     Serial.println("Wi-Fi 이름: " + ssid);
     Serial.printf("비밀번호: %s\n", strlen(AP_PASS) >= 8 ? AP_PASS : "(없음)");
     Serial.println("주소: http://" + ip.toString());
+    showLcd("Open in browser:", ip.toString(), "WiFi: " + ssid,
+            String("PW: ") + (strlen(AP_PASS) >= 8 ? AP_PASS : "(none)"));
   }
 
   server.on("/", handleRoot);

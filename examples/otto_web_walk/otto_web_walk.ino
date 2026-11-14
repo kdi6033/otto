@@ -1,8 +1,8 @@
-// Otto 웹 걷기: Otto 안에 웹서버를 만들고, 휴대폰/PC 브라우저로 전진 속도를 조절한다.
+// Otto 웹 걷기: 인터넷 없이 Otto 가 직접 Wi-Fi 를 만들고, 휴대폰/PC 브라우저로 전진 속도를 조절한다.
 //
 // 사용법
 //  1. 아래 WIFI_SSID, WIFI_PASS 에 공유기(ipTIME 등) 이름과 비밀번호를 넣고 업로드한다.
-//  2. 시리얼 모니터(115200)에 나온 주소(예: http://192.168.0.37)를 같은 공유기에 접속한
+//  2. OLED 화면이나 시리얼 모니터(115200)에 나온 주소(예: http://192.168.0.37)를 같은 공유기에 접속한
 //     휴대폰/PC 브라우저에서 연다. http://otto-xxxx.local 처럼 이름으로도 열 수 있다(안드로이드는 안 될 수 있음).
 //  * 공유기 접속에 실패하면 Otto 가 직접 Wi-Fi "Otto-XXXX"(비밀번호 AP_PASS)를 만든다.
 //    그 Wi-Fi 에 접속하면 화면이 자동으로 뜨고, 안 뜨면 http://192.168.4.1 을 연다.
@@ -21,7 +21,25 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <ESPmDNS.h>
+#include <Wire.h>
+#include <U8g2lib.h>
 #include <OttoI2R.h>
+
+// 1.3" OLED (SH1106, I2C: SDA=18, SCL=17) 에 접속 주소를 보여 준다 (가이드 3.17)
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+
+// OLED 에 네 줄을 쓴다: 제목(작게), 주소(크게), 아래 두 줄(작게)
+void showLcd(const String &title, const String &big, const String &line3, const String &line4) {
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.drawStr(0, 10, title.c_str());
+  u8g2.setFont(u8g2_font_7x13B_tf);   // 주소는 굵고 크게 (IP 15자까지 한 줄)
+  u8g2.drawStr(0, 30, big.c_str());
+  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.drawStr(0, 48, line3.c_str());
+  u8g2.drawStr(0, 62, line4.c_str());
+  u8g2.sendBuffer();
+}
 
 // ▼ 공유기 정보를 여기에 넣는다
 const char *WIFI_SSID = "공유기이름";   // 공유기 이름 (SSID)
@@ -225,6 +243,10 @@ void setup() {
   Serial.begin(115200);
   ottoInit();  // 저장된 보정값을 읽고 다리를 가운데로
 
+  Wire.begin(18, 17);  // OLED I2C: SDA=18, SCL=17
+  u8g2.begin();
+  showLcd("Otto Web Walk", "Connecting...", String("WiFi: ") + WIFI_SSID, "");
+
   // 이름 끝 4글자는 보드마다 다르다 (MAC 주소). Wi-Fi 이름과 .local 이름에 쓴다
   String mac = WiFi.macAddress();
   mac.replace(":", "");
@@ -251,6 +273,7 @@ void setup() {
     Serial.println("공유기 접속 성공");
     Serial.println("주소: http://" + ip.toString());
     Serial.println("이름 주소: http://" + host + ".local");
+    showLcd("Open in browser:", ip.toString(), String("WiFi: ") + WIFI_SSID, host + ".local");
   } else {
     // 2) 실패하면 Otto 가 직접 Wi-Fi 를 만든다
     apMode = true;
@@ -265,6 +288,8 @@ void setup() {
     Serial.println("Wi-Fi 이름: " + ssid);
     Serial.printf("비밀번호: %s\n", strlen(AP_PASS) >= 8 ? AP_PASS : "(없음)");
     Serial.println("주소: http://" + ip.toString());
+    showLcd("Open in browser:", ip.toString(), "WiFi: " + ssid,
+            String("PW: ") + (strlen(AP_PASS) >= 8 ? AP_PASS : "(none)"));
   }
 
   server.on("/", handleRoot);
