@@ -13,7 +13,7 @@ Claude: 프로그램 작성 → 컴파일 → 오류 수정 → 로봇에 업로
 Claude: 속도를 고쳐서 다시 업로드
 ```
 
-> 채팅(claude.ai)에서 코드를 받아 Arduino IDE에 붙여 넣는 더 간단한 방법은 [README의 방법 A](../README.md#방법-a-claudeai-채팅으로-하기-가장-쉬움)를 보세요.
+> 채팅(claude.ai)에서 코드를 받아 Arduino IDE에 붙여 넣는 더 간단한 방법은 [README의 방법 A](../README.md#방법-a-claudeai-채팅으로-하기-초급용-가장-쉬움)를 보세요.
 
 ---
 
