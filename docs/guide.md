@@ -825,6 +825,8 @@ void loop() {
 
 #### 3.2.1 내 로봇에 웹서버 만들기: 휴대폰으로 걷는 속도 조절하기 (otto_web_walk)
 
+[![유튜브 보기](https://img.shields.io/badge/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EB%B3%B4%EA%B8%B0-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/ESt85CP-w_8) [**AI로 만드는 Otto 웹 조종 – Claude 코딩, ESP32 웹서버, 원형 속도 패드, LCD에 IP 표시**](https://youtu.be/ESt85CP-w_8)
+
 **Otto 로봇이 자기 홈페이지를 만들고, 나는 같은 ipTIME Wi-Fi에서 그 홈페이지에 접속해 상태를 보고 조종합니다.**
 클라우드 서버도, 인터넷도 필요 없습니다.
 
