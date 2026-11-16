@@ -9,7 +9,8 @@
 //    그 Wi-Fi 에 접속하면 화면이 자동으로 뜨고, 안 뜨면 http://192.168.4.1 을 연다.
 //  3. 위의 [걷기] [굴리기] [미끄러짐] 중 하나를 고른다.
 //  4. 원의 전진/후진/좌회전/우회전 구역을 누르면 정지할 때까지 계속 움직인다. 가운데 [정지]를 누르면 멈춘다.
-//     걷기·굴리기의 전진/후진은 가운데에 가까우면 느리게(40), 바깥쪽이면 빠르게(200).
+//     걷기·굴리기의 전진/후진은 가운데에 가까울수록 느리게(40), 바깥으로 갈수록 빠르게(200).
+//     누른 채로 밀면 속도가 끊김 없이 바뀐다. (걷기는 다음 걸음부터, 굴리기는 바로)
 //
 // 동작 함수 (OttoI2R 라이브러리)
 //   걷기     : walkFront(속도)   walkBack(속도)   walkLeft()   walkRight()
@@ -166,17 +167,21 @@ const msg = document.getElementById('msg');
 let mode = 'w';          // w 걷기, r 굴리기, s 미끄러짐
 let dir = '';            // '' 이면 정지, f b l r
 let speed = 0;           // 속도를 쓰는 동작일 때만 40~200
-let sentKey = '', lastSend = 0, pressing = false;
+let sentKey = '', lastSend = 0, pressing = false, waiting = null;
 
 const usesSpeed = (m, d) => (m === 'w' || m === 'r') && (d === 'f' || d === 'b');
 
-// 로봇에 보낸다 (같은 값은 1초에 한 번, 다른 값도 0.15초에 한 번만)
+// 로봇에 보낸다. 너무 자주 보내면 로봇이 바빠지므로 0.1초에 한 번만 보내고,
+// 그사이 바뀐 값은 0.1초 뒤에 꼭 보낸다 (손가락을 밀면 속도가 끊김 없이 따라간다).
 function send(force) {
   const a = dir ? mode + dir : 'stop';
   const key = a + ':' + speed;
   const now = Date.now();
-  if (!force && key === sentKey && now - lastSend < 1000) return;
-  if (!force && now - lastSend < 150) return;
+  if (!force && key === sentKey) return;
+  if (!force && now - lastSend < 100) {
+    if (!waiting) waiting = setTimeout(() => { waiting = null; send(false); }, 100 - (now - lastSend));
+    return;
+  }
   lastSend = now; sentKey = key;
   fetch('/move?a=' + a + '&v=' + speed, { cache: 'no-store' })
     .then(() => { msg.textContent = ''; })
@@ -227,7 +232,7 @@ function handle(e) {
   dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'r' : 'l') : (dy < 0 ? 'f' : 'b');
   if (usesSpeed(mode, dir)) {
     const t = Math.min(1, (r - R_STOP) / (R_OUT - R_STOP));      // 0(가운데) ~ 1(바깥)
-    speed = Math.round((V_MIN + t * (V_MAX - V_MIN)) / 10) * 10;  // 10 단위
+    speed = Math.round(V_MIN + t * (V_MAX - V_MIN));              // 40~200 사이로 끊김 없이
     dot.setAttribute('cx', q.x); dot.setAttribute('cy', q.y);
     dot.setAttribute('opacity', 1);
   } else {
