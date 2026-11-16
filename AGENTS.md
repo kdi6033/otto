@@ -207,9 +207,8 @@ moveHip(90, 90);              // 서 있는 자세로 돌아온다
 | servo_yl_pulse, servo_rr_pulse | PWM 펄스폭으로 서보를 직접 움직이는 원리 (교육용) |
 | servo_yl_movehip, servo_rr_rollfoot | 같은 동작을 라이브러리 함수로 |
 | dance_left_turn, dance_right_turn | 한 발로 서서 돌기 |
-| otto_web_walk | 로봇에 웹서버를 만들어 휴대폰으로 걷기 속도 조절 (Wi-Fi, 가이드 4.1) |
-| otto_web_drive | 웹 조종판으로 전진·후진·좌회전·우회전 걷기. 명령 `/move?a=wf&v=속도` (가이드 4.2) |
-| otto_web_modes | 웹 조종판에 [걷기] [굴리기] [미끄러짐] 모드 버튼 추가, 동작 코드 12개 (가이드 4.3) |
+| otto_web_walk | 로봇에 웹서버를 만들어 휴대폰으로 걷기 속도 조절 (Wi-Fi, 가이드 4.1.1) |
+| otto_web_modes | 웹 조종판에 네 방향과 [걷기] [굴리기] [미끄러짐] 모드 버튼. 명령 `/move?a=wf&v=속도`, 동작 코드 12개 (가이드 4.1.2). 4장 다음 기능은 이 예제에 덧붙인다 |
 | oled_hello, oled_korean, oled_eyes, oled_sleepy_eyes | OLED 글자, 한글, 눈 그래픽 |
 | led_basic, led_effects | LED 링 색과 효과 |
 | distance_vl53l0x | 거리 센서 읽기 |

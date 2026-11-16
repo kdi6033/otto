@@ -33,7 +33,6 @@ AI가 코드를 만들기 전에 꼭 알아야 할 요약:
 - [거리 센서](https://raw.githubusercontent.com/kdi6033/otto/main/examples/distance_vl53l0x/distance_vl53l0x.ino)
 - [OLED + 거리 센서 + LED](https://raw.githubusercontent.com/kdi6033/otto/main/examples/face_sensor_led/face_sensor_led.ino)
 - [휴대폰으로 걷기 속도 조절(웹서버)](https://raw.githubusercontent.com/kdi6033/otto/main/examples/otto_web_walk/otto_web_walk.ino)
-- [웹 조종판 네 방향(웹서버)](https://raw.githubusercontent.com/kdi6033/otto/main/examples/otto_web_drive/otto_web_drive.ino)
 - [웹 조종판 걷기/굴리기/미끄러짐 모드(웹서버)](https://raw.githubusercontent.com/kdi6033/otto/main/examples/otto_web_modes/otto_web_modes.ino)
 
 ## Optional
