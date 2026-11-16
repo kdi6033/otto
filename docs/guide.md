@@ -30,6 +30,10 @@
   - [3.18 LED 프로그램](#-318-led-프로그램)
   - [3.19 거리 센서](#-319-거리-센서)
   - [3.20 조도센서 (GY302)](#-320-조도센서-gy302)
+- [4. 내 로봇에 웹서버 만들기 (로컬 서버)](#-4-내-로봇에-웹서버-만들기-로컬-서버)
+  - [4.1 웹서버 기초: 휴대폰으로 걷는 속도 조절하기 (otto_web_walk)](#-41-웹서버-기초-휴대폰으로-걷는-속도-조절하기-otto_web_walk)
+  - [4.2 네 방향으로 조종하기 (otto_web_drive)](#-42-네-방향으로-조종하기-otto_web_drive)
+  - [4.3 걷기, 굴리기, 미끄러짐 모드 고르기 (otto_web_modes)](#-43-걷기-굴리기-미끄러짐-모드-고르기-otto_web_modes)
 
 
 
@@ -823,434 +827,8 @@ void loop() {
 ```
 </details>
 
-#### 3.2.1 내 로봇에 웹서버 만들기: 휴대폰으로 걷는 속도 조절하기 (otto_web_walk)
+> 💡 **휴대폰으로 걷게 하기:** 휴대폰 브라우저의 원형 조종판으로 걷는 속도를 바꾸는 방법은 [4.1 웹서버 기초](#-41-웹서버-기초-휴대폰으로-걷는-속도-조절하기-otto_web_walk)에 있어요.
 
-[![유튜브 보기](https://img.shields.io/badge/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EB%B3%B4%EA%B8%B0-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/ESt85CP-w_8) [**AI로 만드는 Otto 웹 조종 – Claude 코딩, ESP32 웹서버, 원형 속도 패드, LCD에 IP 표시**](https://youtu.be/ESt85CP-w_8)
-
-**Otto 로봇이 자기 홈페이지를 만들고, 나는 같은 ipTIME Wi-Fi에서 그 홈페이지에 접속해 상태를 보고 조종합니다.**
-클라우드 서버도, 인터넷도 필요 없습니다.
-
-<img src="../images/otto-net-01-concept.svg" alt="Otto가 홈페이지를 열고, 휴대폰이나 PC가 같은 ipTIME Wi-Fi로 접속해 모니터링과 제어를 하는 구성" width="700">
-
-- **Otto:** 공유기에 접속해서 홈페이지(웹서버)를 엽니다.
-- **나:** 휴대폰이나 PC를 같은 공유기에 연결하고, 브라우저로 Otto 주소에 들어갑니다.
-- **모니터링:** Otto가 보내 준 화면으로 상태를 봅니다.
-- **제어:** 화면의 버튼을 누르면 명령이 Otto로 갑니다.
-
-**접속 순서**
-
-<img src="../images/otto-net-02-steps.svg" alt="접속 순서 4단계: Wi-Fi 정보 입력, 업로드, 주소 확인, 접속" width="700">
-
-1. 스케치(`otto_web_walk.ino`)에 공유기 이름과 비밀번호를 적습니다.
-   ```cpp
-   const char *WIFI_SSID = "공유기이름";
-   const char *WIFI_PASS = "비밀번호";
-   ```
-2. Otto에 업로드하고, 건전지 전원을 연결합니다.
-3. Otto의 **OLED 화면**(또는 시리얼 모니터 115200)에서 주소 `http://192.168.0.xx`를 확인합니다.
-4. 휴대폰을 **같은 공유기 Wi-Fi**에 연결하고, 브라우저에 그 주소를 입력합니다.
-
-**주의할 점**
-
-- 공유기 Wi-Fi가 **2.4GHz**인지 확인합니다. Otto는 5GHz Wi-Fi에 접속하지 못합니다.
-- 밖에서 접속하려고 공유기 포트를 열지 마세요. 필요하면 ipTIME VPN을 씁니다.
-
----
-
-이번에는 Otto I2R 로봇 안에 **작은 웹서버**를 만들어요. 휴대폰이나 PC의 브라우저로 로봇에 접속하면 아래와 같은 원 모양 조종판이 나오고, 손가락으로 눌러서 로봇을 앞으로 걷게 할 수 있어요. 인터넷이나 서버가 없어도 **공유기 하나만 있으면** 동작해요.
-
-- 원의 **위쪽(전진)** 을 누르면 로봇이 앞으로 걸어요.
-- **가운데에 가까울수록 천천히(40)**, **바깥쪽일수록 빠르게(200)** 걸어요. 앞에서 배운 `walkFront(숫자)`의 숫자가 손가락 위치에 따라 바뀌는 거예요.
-- 가운데 **[정지]** 를 누르면 걷던 걸음을 바로 멈춰요.
-- 좌회전, 우회전, 후진은 아직 회색이에요. 앞으로 여러분이 직접 만들어 볼 부분이에요.
-
-<img src="../images/otto-web-walk-pad.png" alt="휴대폰 브라우저로 Otto 웹서버에 접속한 조종판 화면: 전진 영역, 가운데 정지 버튼, 회색 좌회전·우회전·후진" width="300">
-
-**어떻게 동작할까요?**
-
-```
-휴대폰 브라우저 ──(공유기)──▶ Otto 웹서버
-  원을 누름        /walk?v=120      walkFront(120) 으로 걷기
-  [정지]           /walk?v=0        바로 멈추기
-```
-
-1. Otto가 공유기에 접속하고, 자기 주소(IP)를 OLED 화면과 시리얼 모니터에 보여 줘요.
-2. 브라우저에서 그 주소를 열면 Otto가 조종판 화면(HTML)을 보내 줘요. 화면도 로봇 안에 들어 있어요.
-3. 원을 누르면 화면이 `/walk?v=속도`라는 주소로 속도를 보내고, Otto는 그 속도로 `walkFront(속도)`를 계속 불러요.
-
-**준비하기**
-
-1. 아래 프로그램에서 공유기 이름과 비밀번호를 내 공유기 것으로 바꿔요.
-   ```c
-   const char *WIFI_SSID = "공유기이름";   // 공유기 이름 (SSID)
-   const char *WIFI_PASS = "비밀번호";     // 공유기 비밀번호
-   ```
-   > ⚠️ ESP32는 **2.4GHz Wi-Fi만** 접속할 수 있어요. 이름 끝에 `_5G`가 붙은 Wi-Fi는 안 돼요.
-2. 업로드하면 로봇의 **OLED 화면**에 접속할 주소가 나와요. PC가 없어도 화면만 보고 접속할 수 있어요.
-   ```
-   Open in browser:
-   192.168.0.52          ← 이 주소를 열어요 (크게 표시)
-   WiFi: iptime
-   otto-xxxx.local
-   ```
-   시리얼 모니터(115200)에도 같은 내용이 나와요.
-   ```
-   공유기 'iptime' 에 접속 중......
-   공유기 접속 성공
-   주소: http://192.168.0.52
-   이름 주소: http://otto-xxxx.local
-   ```
-3. **같은 공유기에 접속한** 휴대폰이나 PC의 브라우저에서 그 주소(예: `http://192.168.0.52`)를 열어요.
-
-**공유기에 접속하지 못하면?**
-
-15초 동안 공유기에 접속하지 못하면(비밀번호가 틀렸거나 공유기가 없을 때) Otto가 **직접 Wi-Fi를 만들어요.**
-
-- Wi-Fi 이름: `Otto-XXXX` (OLED 화면과 시리얼 모니터에 나와요)
-- 비밀번호: `12345678`
-- 휴대폰을 이 Wi-Fi에 연결하면 조종판 화면이 자동으로 떠요. 안 뜨면 브라우저에서 `http://192.168.4.1`을 열어요.
-- "인터넷 연결 없음"이라는 안내가 나오면 **연결 유지**를 눌러요.
-
-**접속이 안 될 때 확인할 것**
-
-| 증상 | 확인할 것 |
-|---|---|
-| 브라우저에 "사이트에 연결할 수 없음" | 휴대폰/PC가 **로봇과 같은 공유기**에 연결돼 있나요? PC가 유선으로 다른 네트워크에 있거나 Wi-Fi가 꺼져 있으면 접속할 수 없어요. |
-| 시리얼에 "공유기 접속 실패" | 공유기 이름과 비밀번호를 다시 확인하고, 2.4GHz Wi-Fi인지 확인해요. |
-| 어제와 주소가 달라요 | 공유기가 주소를 바꿔 줄 수 있어요. OLED 화면에서 새 주소를 확인해요. |
-| OLED에 `Connecting...`만 계속 보여요 | 공유기에 접속하는 중이에요. 15초가 지나도 안 되면 Otto가 직접 Wi-Fi를 만들고 그 이름과 비밀번호를 보여 줘요. |
-| 걷다가 저절로 멈춰요 | 휴대폰 화면이 꺼지면 3초 뒤 안전하게 멈춰요. 건전지가 약해도 멈출 수 있어요. |
-
-> 💡 **안전 장치:** 화면이 3초 넘게 신호를 보내지 않으면(휴대폰 화면 꺼짐, Wi-Fi 끊김) 로봇이 스스로 멈춰요.<br>
-> ⚠️ 같은 공유기에 접속한 사람은 누구나 주소만 알면 내 로봇을 조종할 수 있어요. 교실에서는 내 로봇 주소를 확인하고 접속해요.
-
-**프로그램 살펴보기**
-
-| 부분 | 하는 일 |
-|---|---|
-| `PAGE` | 브라우저에 보낼 조종판 화면(HTML, SVG, JavaScript)이에요. 원을 누른 위치로 속도를 계산해요. |
-| `handleWalk()` | `/walk?v=속도` 주소로 들어온 속도를 받아요. 0이면 바로 멈춰요. |
-| `walkTask()` | 받은 속도로 `walkFront(속도)`를 계속 불러요. 한 걸음에 약 1초가 걸리니, 그동안에도 화면 명령을 받을 수 있게 따로 돌려요. |
-| `stopNow()` | 걷던 걸음을 끊고 두 발을 멈추고 다리를 가운데(90도)로 돌려놓아요. |
-| `showLcd()` | OLED에 네 줄을 써요. 둘째 줄(접속 주소)은 굵고 크게 보여 줘요. OLED 사용법은 [3.17](#-317-13-oled-lcd-128x64)을 보세요. |
-| `setup()` | OLED를 켜고, 공유기에 접속하고(실패하면 Wi-Fi 만들기), 접속 주소를 OLED에 보여 준 뒤 웹서버를 시작해요. |
-
-> 💡 **도전해 보세요!** 화면의 `후진` 영역을 누르면 `walkBack(속도)`로 뒤로 걷게 바꿔 보세요. 화면(`PAGE`)에서 속도를 음수로 보내고, `walkTask()`에서 음수면 `walkBack()`을 부르게 하면 돼요.
-
-<br>
-<details>
-    <summary>💻 휴대폰으로 걷는 속도 조절하기 (otto_web_walk.ino) </summary>
-
-```c
-// Otto 웹 걷기: 인터넷 없이 Otto 가 직접 Wi-Fi 를 만들고, 휴대폰/PC 브라우저로 전진 속도를 조절한다.
-//
-// 사용법
-//  1. 아래 WIFI_SSID, WIFI_PASS 에 공유기(ipTIME 등) 이름과 비밀번호를 넣고 업로드한다.
-//  2. OLED 화면이나 시리얼 모니터(115200)에 나온 주소(예: http://192.168.0.37)를 같은 공유기에 접속한
-//     휴대폰/PC 브라우저에서 연다. http://otto-xxxx.local 처럼 이름으로도 열 수 있다(안드로이드는 안 될 수 있음).
-//  * 공유기 접속에 실패하면 Otto 가 직접 Wi-Fi "Otto-XXXX"(비밀번호 AP_PASS)를 만든다.
-//    그 Wi-Fi 에 접속하면 화면이 자동으로 뜨고, 안 뜨면 http://192.168.4.1 을 연다.
-//  3. 원의 위쪽(전진)을 누르면 걷는다. 가운데에 가까우면 느리게(40), 바깥쪽이면 빠르게(200).
-//     가운데 [정지]를 누르면 멈춘다.
-//
-// 걷기 함수는 이것만 쓴다.
-//   walkFront();      // 보통 속도 (walkFront(100) 과 같아요)
-//   walkFront(60);    // 천천히 걷기
-//   walkFront(150);   // 빠르게 걷기
-//
-// 안전: 화면이 3초 넘게 신호를 보내지 않으면(휴대폰 화면 꺼짐, Wi-Fi 끊김) 스스로 멈춘다.
-// 보정값은 웹 [로봇 맞추기]에서 보드에 저장한 값을 ottoInit() 이 읽어서 쓴다.
-
-#include <WiFi.h>
-#include <WebServer.h>
-#include <DNSServer.h>
-#include <ESPmDNS.h>
-#include <Wire.h>
-#include <U8g2lib.h>
-#include <OttoI2R.h>
-
-// 1.3" OLED (SH1106, I2C: SDA=18, SCL=17) 에 접속 주소를 보여 준다 (가이드 3.17)
-U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
-
-// OLED 에 네 줄을 쓴다: 제목(작게), 주소(크게), 아래 두 줄(작게)
-void showLcd(const String &title, const String &big, const String &line3, const String &line4) {
-  u8g2.clearBuffer();
-  u8g2.setFont(u8g2_font_6x10_tf);
-  u8g2.drawStr(0, 10, title.c_str());
-  u8g2.setFont(u8g2_font_7x13B_tf);   // 주소는 굵고 크게 (IP 15자까지 한 줄)
-  u8g2.drawStr(0, 30, big.c_str());
-  u8g2.setFont(u8g2_font_6x10_tf);
-  u8g2.drawStr(0, 48, line3.c_str());
-  u8g2.drawStr(0, 62, line4.c_str());
-  u8g2.sendBuffer();
-}
-
-// ▼ 공유기 정보를 여기에 넣는다
-const char *WIFI_SSID = "공유기이름";   // 공유기 이름 (SSID)
-const char *WIFI_PASS = "비밀번호";     // 공유기 비밀번호
-const unsigned long WIFI_WAIT_MS = 15000;  // 공유기 접속을 기다리는 시간
-
-// 공유기 접속에 실패했을 때 Otto 가 만드는 Wi-Fi 의 비밀번호 (8자 이상). "" 이면 비밀번호 없음
-const char *AP_PASS = "12345678";
-bool apMode = false;  // true 면 Otto 가 직접 Wi-Fi 를 만든 상태
-
-const int SPEED_MIN = 40;
-const int SPEED_MAX = 200;
-const unsigned long SIGNAL_TIMEOUT_MS = 3000;  // 이 시간 동안 화면 신호가 없으면 멈춤
-
-WebServer server(80);
-DNSServer dns;
-
-volatile int walkSpeed = 0;          // 0 이면 정지, 40~200 이면 그 속도로 전진
-volatile unsigned long lastSignal = 0;  // 마지막으로 화면 신호를 받은 시각
-TaskHandle_t walkHandle = nullptr;    // 걷기 작업 (정지할 때 지운다)
-
-void stopNow();
-
-// ── 화면 (HTML) ─────────────────────────────────────────────
-const char PAGE[] PROGMEM = R"HTML(
-<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>Otto 걷기</title>
-<style>
-  body { margin:0; font-family:sans-serif; background:#f4f6f9; color:#1f2937;
-         display:flex; flex-direction:column; align-items:center; }
-  h1 { font-size:20px; margin:20px 0 4px; }
-  #state { font-size:16px; margin-bottom:12px; color:#475569; }
-  #state b { color:#2563eb; }
-  svg { width:min(92vw,380px); height:auto; touch-action:none; user-select:none; }
-  .small { font-size:11px; fill:#64748b; }
-  .dir { font-size:20px; font-weight:bold; fill:#1f2937; }
-  .off { fill:#cbd5e1; }
-  #msg { height:20px; font-size:13px; color:#94a3b8; margin-top:8px; }
-</style>
-</head>
-<body>
-<h1>Otto 걷기</h1>
-<div id="state">정지</div>
-
-<svg id="pad" viewBox="0 0 320 320">
-  <circle cx="160" cy="160" r="156" fill="#eef1f5"/>
-  <circle cx="160" cy="160" r="140" fill="#fafbfc" stroke="#94a3b8" stroke-width="3"/>
-  <!-- 전진 영역 강조 -->
-  <path d="M160 160 L61 61 A140 140 0 0 1 259 61 Z" fill="#eff6ff"/>
-  <!-- X 선 -->
-  <line x1="61" y1="61" x2="259" y2="259" stroke="#cbd5e1"/>
-  <line x1="259" y1="61" x2="61" y2="259" stroke="#cbd5e1"/>
-  <!-- 느리게/빠르게 경계 점선 -->
-  <circle cx="160" cy="160" r="80" fill="none" stroke="#cbd5e1" stroke-dasharray="4 4"/>
-  <!-- 눌린 위치 -->
-  <circle id="dot" cx="160" cy="160" r="9" fill="#2563eb" opacity="0"/>
-  <!-- 글자 -->
-  <text x="160" y="35" text-anchor="middle" class="small">빠르게 200</text>
-  <path d="M152 46 L160 40 L168 46" fill="none" stroke="#64748b" stroke-width="2.5"/>
-  <text x="160" y="72" text-anchor="middle" class="dir">전진</text>
-  <text x="160" y="102" text-anchor="middle" class="small">느리게 40</text>
-  <text x="60" y="166" text-anchor="middle" class="dir off">좌회전</text>
-  <text x="260" y="166" text-anchor="middle" class="dir off">우회전</text>
-  <text x="160" y="262" text-anchor="middle" class="dir off">후진</text>
-  <!-- 정지 버튼 -->
-  <circle cx="160" cy="160" r="42" fill="#ffe4e6" stroke="#fda4af" stroke-width="4"/>
-  <text x="160" y="168" text-anchor="middle" style="font-size:22px;font-weight:bold;fill:#e11d48">정지</text>
-</svg>
-<div id="msg"></div>
-
-<script>
-const R_STOP = 42, R_OUT = 140, V_MIN = 40, V_MAX = 200;
-const pad = document.getElementById('pad');
-const dot = document.getElementById('dot');
-const state = document.getElementById('state');
-const msg = document.getElementById('msg');
-let speed = 0, sent = -1, lastSend = 0, pressing = false;
-
-// 서보에 보낸다 (같은 값은 0.15초에 한 번만)
-function send(force) {
-  const now = Date.now();
-  if (!force && speed === sent && now - lastSend < 1000) return;
-  if (!force && now - lastSend < 150) return;
-  lastSend = now; sent = speed;
-  fetch('/walk?v=' + speed, { cache: 'no-store' })
-    .then(() => { msg.textContent = ''; })
-    .catch(() => { msg.textContent = '로봇과 연결이 끊겼어요'; });
-}
-
-function show() {
-  state.innerHTML = speed ? '전진 <b>' + speed + '</b>' : '정지';
-  if (!speed) dot.setAttribute('opacity', 0);
-}
-
-// 눌린 위치를 SVG 좌표로 바꿔 속도를 정한다
-function handle(e) {
-  const p = pad.createSVGPoint();
-  p.x = e.clientX; p.y = e.clientY;
-  const q = p.matrixTransform(pad.getScreenCTM().inverse());
-  const dx = q.x - 160, dy = q.y - 160, r = Math.hypot(dx, dy);
-
-  if (r <= R_STOP) { speed = 0; show(); send(true); return; }   // 정지 버튼
-  if (r > R_OUT + 12) return;                                  // 원 바깥
-  if (!(dy < 0 && Math.abs(dx) <= -dy)) {                      // 전진(위쪽) 영역이 아님
-    msg.textContent = '지금은 전진만 할 수 있어요';
-    return;
-  }
-  msg.textContent = '';
-  const t = Math.min(1, (r - R_STOP) / (R_OUT - R_STOP));      // 0(가운데) ~ 1(바깥)
-  speed = Math.round((V_MIN + t * (V_MAX - V_MIN)) / 10) * 10;  // 10 단위
-  dot.setAttribute('cx', q.x); dot.setAttribute('cy', q.y);
-  dot.setAttribute('opacity', 1);
-  show(); send(false);
-}
-
-pad.addEventListener('pointerdown', e => { pressing = true; pad.setPointerCapture(e.pointerId); handle(e); });
-pad.addEventListener('pointermove', e => { if (pressing) handle(e); });
-pad.addEventListener('pointerup', () => { pressing = false; send(true); });
-pad.addEventListener('pointercancel', () => { pressing = false; });
-
-// 걷는 동안 1초마다 "아직 연결돼 있어요" 신호를 보낸다 (끊기면 로봇이 3초 뒤 스스로 멈춤)
-setInterval(() => { if (speed) send(true); }, 1000);
-</script>
-</body>
-</html>
-)HTML";
-
-// ── 웹 요청 처리 ────────────────────────────────────────────
-void handleRoot() {
-  server.send_P(200, "text/html; charset=utf-8", PAGE);
-}
-
-// /walk?v=속도  (0 이면 정지)
-void handleWalk() {
-  int v = server.arg("v").toInt();
-  if (v != 0) v = constrain(v, SPEED_MIN, SPEED_MAX);
-  lastSignal = millis();
-  if (v == 0) {
-    stopNow();  // 걸음이 끝나기를 기다리지 않고 바로 멈춘다
-  } else {
-    if (v != walkSpeed) Serial.printf("속도: %d\n", v);
-    walkSpeed = v;
-  }
-  server.send(200, "text/plain", "ok");
-}
-
-// 모르는 주소 처리
-//  - Otto 가 만든 Wi-Fi 일 때: 휴대폰이 인터넷 확인용으로 여는 주소를 첫 화면으로 보낸다 (화면 자동으로 뜨기)
-//  - 공유기에 접속했을 때: 그냥 "없음"
-void handleOther() {
-  if (apMode) {
-    server.sendHeader("Location", "http://192.168.4.1/", true);
-    server.send(302, "text/plain", "");
-  } else {
-    server.send(404, "text/plain", "not found");
-  }
-}
-
-// ── 걷기 (따로 도는 작업) ───────────────────────────────────
-// walkFront() 는 한 걸음에 약 1초 걸린다. 그동안에도 웹 요청을 받도록 걷기는 따로 돌린다.
-void walkTask(void *) {
-  for (;;) {
-    int v = walkSpeed;
-    if (v > 0 && millis() - lastSignal > SIGNAL_TIMEOUT_MS) {
-      Serial.println("화면 신호가 끊겨서 멈춤");
-      walkSpeed = 0;
-      v = 0;
-    }
-    if (v > 0) {
-      walkFront(v);
-    } else {
-      delay(20);
-    }
-  }
-}
-
-void startWalkTask() {
-  xTaskCreatePinnedToCore(walkTask, "walk", 4096, nullptr, 1, &walkHandle, 1);
-}
-
-// [정지]: 걷던 걸음을 그 자리에서 끊고, 두 발을 정지 신호(1.5ms)로, 다리를 가운데(90도)로 둔다.
-// walkFront() 는 한 걸음(약 1초)이 끝나야 돌아오므로, 걷기 작업을 지우고 새로 만든다.
-void stopNow() {
-  walkSpeed = 0;
-  if (walkHandle) {
-    vTaskDelete(walkHandle);
-    walkHandle = nullptr;
-  }
-  ottoRollFeet(0, 0);  // 두 발 모두 1.5ms 정지 신호
-  writeYL(90);         // 다리를 가운데로
-  writeYR(90);
-  Serial.println("정지");
-  startWalkTask();     // 다음 명령을 받을 수 있게 걷기 작업을 다시 만든다
-}
-
-void setup() {
-  Serial.begin(115200);
-  ottoInit();  // 저장된 보정값을 읽고 다리를 가운데로
-
-  Wire.begin(18, 17);  // OLED I2C: SDA=18, SCL=17
-  u8g2.begin();
-  showLcd("Otto Web Walk", "Connecting...", String("WiFi: ") + WIFI_SSID, "");
-
-  // 이름 끝 4글자는 보드마다 다르다 (MAC 주소). Wi-Fi 이름과 .local 이름에 쓴다
-  String mac = WiFi.macAddress();
-  mac.replace(":", "");
-  String tail = mac.substring(8);
-  tail.toLowerCase();
-
-  // 1) 공유기에 접속한다
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  Serial.printf("공유기 '%s' 에 접속 중", WIFI_SSID);
-  unsigned long start = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - start < WIFI_WAIT_MS) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println();
-
-  IPAddress ip;
-  if (WiFi.status() == WL_CONNECTED) {
-    ip = WiFi.localIP();
-    String host = "otto-" + tail;
-    MDNS.begin(host.c_str());  // http://otto-xxxx.local 로도 열 수 있게
-    MDNS.addService("http", "tcp", 80);
-    Serial.println("공유기 접속 성공");
-    Serial.println("주소: http://" + ip.toString());
-    Serial.println("이름 주소: http://" + host + ".local");
-    showLcd("Open in browser:", ip.toString(), String("WiFi: ") + WIFI_SSID, host + ".local");
-  } else {
-    // 2) 실패하면 Otto 가 직접 Wi-Fi 를 만든다
-    apMode = true;
-    WiFi.disconnect(true);
-    WiFi.mode(WIFI_AP);
-    String ssid = "Otto-" + mac.substring(8);  // 예: Otto-A1B2
-    WiFi.softAP(ssid.c_str(), strlen(AP_PASS) >= 8 ? AP_PASS : nullptr);
-    delay(100);
-    ip = WiFi.softAPIP();
-    dns.start(53, "*", ip);  // 모든 주소를 Otto 로 → 접속하면 화면이 자동으로 뜬다
-    Serial.println("공유기 접속 실패: Otto 가 직접 Wi-Fi 를 만듭니다");
-    Serial.println("Wi-Fi 이름: " + ssid);
-    Serial.printf("비밀번호: %s\n", strlen(AP_PASS) >= 8 ? AP_PASS : "(없음)");
-    Serial.println("주소: http://" + ip.toString());
-    showLcd("Open in browser:", ip.toString(), "WiFi: " + ssid,
-            String("PW: ") + (strlen(AP_PASS) >= 8 ? AP_PASS : "(none)"));
-  }
-
-  server.on("/", handleRoot);
-  server.on("/walk", handleWalk);
-  server.onNotFound(handleOther);
-  server.begin();
-
-  startWalkTask();
-}
-
-void loop() {
-  if (apMode) dns.processNextRequest();
-  server.handleClient();
-  delay(2);
-}
-```
-</details>
 --------
 
 ### ✅ 3.3 뒤로 걷기 (walk_back)
@@ -2787,3 +2365,586 @@ void loop() {
 - 주소 변경: GY-302 센서에서 ADDR 핀을 GND에 연결하면 주소는 0x23, VCC에 연결하면 0x5C입니다. 대부분 GND 또는 미연결(기본 0x23)로 사용됩니다.
 - 조도 범위: 약 1~65535 lux까지 측정 가능.
 
+
+-----------
+## ✅ 4. 내 로봇에 웹서버 만들기 (로컬 서버)
+
+3장에서는 동작, OLED, LED, 센서를 **하나씩** 배웠어요. 4장에서는 그것들을 **하나의 웹 조종 프로그램**으로 모아요.
+Otto 안에 작은 웹서버를 만들고, 휴대폰이나 PC 브라우저로 접속해서 조종해요. 인터넷이나 클라우드 서버 없이 **공유기 하나만 있으면** 돼요.
+
+한 단원에서 **i2r.link 조종 화면의 버튼을 하나씩** 늘려 가요. 마지막 단원까지 하면 내 브라우저 화면이 i2r.link와 거의 같아져요.
+
+| 단원 | 추가하는 것 | 예제 |
+|---|---|---|
+| [4.1](#-41-웹서버-기초-휴대폰으로-걷는-속도-조절하기-otto_web_walk) | 웹서버 기초: 전진, 속도 조절 | `otto_web_walk` |
+| [4.2](#-42-네-방향으로-조종하기-otto_web_drive) | 후진, 좌회전, 우회전 | `otto_web_drive` |
+| [4.3](#-43-걷기-굴리기-미끄러짐-모드-고르기-otto_web_modes) | [걷기] [굴리기] [미끄러짐] 버튼 | `otto_web_modes` |
+| 4.4 (준비 중) | 조명, LED 데모 | |
+| 4.5 (준비 중) | 댄스, OTTO 데모 | |
+| 4.6 (준비 중) | 순찰 (거리 센서) | |
+| 4.7 (준비 중) | 시계, 예약 | |
+| 4.8 (준비 중) | 내 음악 | |
+| 4.9 (준비 중) | 로봇 맞추기 | |
+
+> 💡 **이어서 만들 것:** 4장을 마치면, 같은 기능을 인터넷 서버에 연결해서 집 밖에서도 조종하는 단원을 이어서 준비하고 있어요.
+
+**단원마다 이렇게 해요** (4.1은 기초라서 정답 코드를 바로 올리고, 4.2부터 아래 순서로 해요)
+
+1. **AI에게 말하기**: 단원에 있는 문장을 복사해서 [claude.ai](https://claude.ai)에 붙여 넣어요. 앞 단원의 코드 주소가 들어 있어서, AI가 그 코드에 기능 하나만 더해 줘요.
+2. **업로드하고 확인하기**: 단원의 "확인할 것"대로 움직이는지 봐요.
+3. **잘 안 되면**: 단원의 정답 예제와 비교하거나, 정답 예제를 그대로 올려요.
+4. **바뀐 부분 읽기**: 앞 단원에서 무엇이 달라졌는지 짚어 봐요.
+
+> ⚠️ 이 장의 예제에는 공유기 이름과 비밀번호를 적어야 해요. 내 비밀번호를 적은 코드는 GitHub나 인터넷에 올리지 마세요.
+
+-----------
+### ✅ 4.1 웹서버 기초: 휴대폰으로 걷는 속도 조절하기 (otto_web_walk)
+
+[![유튜브 보기](https://img.shields.io/badge/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EB%B3%B4%EA%B8%B0-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/ESt85CP-w_8) [**AI로 만드는 Otto 웹 조종 – Claude 코딩, ESP32 웹서버, 원형 속도 패드, LCD에 IP 표시**](https://youtu.be/ESt85CP-w_8)
+
+**Otto 로봇이 자기 홈페이지를 만들고, 나는 같은 ipTIME Wi-Fi에서 그 홈페이지에 접속해 상태를 보고 조종합니다.**
+클라우드 서버도, 인터넷도 필요 없습니다.
+
+<img src="../images/otto-net-01-concept.svg" alt="Otto가 홈페이지를 열고, 휴대폰이나 PC가 같은 ipTIME Wi-Fi로 접속해 모니터링과 제어를 하는 구성" width="700">
+
+- **Otto:** 공유기에 접속해서 홈페이지(웹서버)를 엽니다.
+- **나:** 휴대폰이나 PC를 같은 공유기에 연결하고, 브라우저로 Otto 주소에 들어갑니다.
+- **모니터링:** Otto가 보내 준 화면으로 상태를 봅니다.
+- **제어:** 화면의 버튼을 누르면 명령이 Otto로 갑니다.
+
+**접속 순서**
+
+<img src="../images/otto-net-02-steps.svg" alt="접속 순서 4단계: Wi-Fi 정보 입력, 업로드, 주소 확인, 접속" width="700">
+
+1. 스케치(`otto_web_walk.ino`)에 공유기 이름과 비밀번호를 적습니다.
+   ```cpp
+   const char *WIFI_SSID = "공유기이름";
+   const char *WIFI_PASS = "비밀번호";
+   ```
+2. Otto에 업로드하고, 건전지 전원을 연결합니다.
+3. Otto의 **OLED 화면**(또는 시리얼 모니터 115200)에서 주소 `http://192.168.0.xx`를 확인합니다.
+4. 휴대폰을 **같은 공유기 Wi-Fi**에 연결하고, 브라우저에 그 주소를 입력합니다.
+
+**주의할 점**
+
+- 공유기 Wi-Fi가 **2.4GHz**인지 확인합니다. Otto는 5GHz Wi-Fi에 접속하지 못합니다.
+- 밖에서 접속하려고 공유기 포트를 열지 마세요. 필요하면 ipTIME VPN을 씁니다.
+
+---
+
+이번에는 Otto I2R 로봇 안에 **작은 웹서버**를 만들어요. 휴대폰이나 PC의 브라우저로 로봇에 접속하면 아래와 같은 원 모양 조종판이 나오고, 손가락으로 눌러서 로봇을 앞으로 걷게 할 수 있어요. 인터넷이나 서버가 없어도 **공유기 하나만 있으면** 동작해요.
+
+- 원의 **위쪽(전진)** 을 누르면 로봇이 앞으로 걸어요.
+- **가운데에 가까울수록 천천히(40)**, **바깥쪽일수록 빠르게(200)** 걸어요. 앞에서 배운 `walkFront(숫자)`의 숫자가 손가락 위치에 따라 바뀌는 거예요.
+- 가운데 **[정지]** 를 누르면 걷던 걸음을 바로 멈춰요.
+- 좌회전, 우회전, 후진은 아직 회색이에요. 다음 단원 [4.2](#-42-네-방향으로-조종하기-otto_web_drive)에서 만들어요.
+
+<img src="../images/otto-web-walk-pad.png" alt="휴대폰 브라우저로 Otto 웹서버에 접속한 조종판 화면: 전진 영역, 가운데 정지 버튼, 회색 좌회전·우회전·후진" width="300">
+
+**어떻게 동작할까요?**
+
+```
+휴대폰 브라우저 ──(공유기)──▶ Otto 웹서버
+  원을 누름        /walk?v=120      walkFront(120) 으로 걷기
+  [정지]           /walk?v=0        바로 멈추기
+```
+
+1. Otto가 공유기에 접속하고, 자기 주소(IP)를 OLED 화면과 시리얼 모니터에 보여 줘요.
+2. 브라우저에서 그 주소를 열면 Otto가 조종판 화면(HTML)을 보내 줘요. 화면도 로봇 안에 들어 있어요.
+3. 원을 누르면 화면이 `/walk?v=속도`라는 주소로 속도를 보내고, Otto는 그 속도로 `walkFront(속도)`를 계속 불러요.
+
+**준비하기**
+
+1. 아래 프로그램에서 공유기 이름과 비밀번호를 내 공유기 것으로 바꿔요.
+   ```c
+   const char *WIFI_SSID = "공유기이름";   // 공유기 이름 (SSID)
+   const char *WIFI_PASS = "비밀번호";     // 공유기 비밀번호
+   ```
+   > ⚠️ ESP32는 **2.4GHz Wi-Fi만** 접속할 수 있어요. 이름 끝에 `_5G`가 붙은 Wi-Fi는 안 돼요.
+2. 업로드하면 로봇의 **OLED 화면**에 접속할 주소가 나와요. PC가 없어도 화면만 보고 접속할 수 있어요.
+   ```
+   Open in browser:
+   192.168.0.52          ← 이 주소를 열어요 (크게 표시)
+   WiFi: iptime
+   otto-xxxx.local
+   ```
+   시리얼 모니터(115200)에도 같은 내용이 나와요.
+   ```
+   공유기 'iptime' 에 접속 중......
+   공유기 접속 성공
+   주소: http://192.168.0.52
+   이름 주소: http://otto-xxxx.local
+   ```
+3. **같은 공유기에 접속한** 휴대폰이나 PC의 브라우저에서 그 주소(예: `http://192.168.0.52`)를 열어요.
+
+**공유기에 접속하지 못하면?**
+
+15초 동안 공유기에 접속하지 못하면(비밀번호가 틀렸거나 공유기가 없을 때) Otto가 **직접 Wi-Fi를 만들어요.**
+
+- Wi-Fi 이름: `Otto-XXXX` (OLED 화면과 시리얼 모니터에 나와요)
+- 비밀번호: `12345678`
+- 휴대폰을 이 Wi-Fi에 연결하면 조종판 화면이 자동으로 떠요. 안 뜨면 브라우저에서 `http://192.168.4.1`을 열어요.
+- "인터넷 연결 없음"이라는 안내가 나오면 **연결 유지**를 눌러요.
+
+**접속이 안 될 때 확인할 것**
+
+| 증상 | 확인할 것 |
+|---|---|
+| 브라우저에 "사이트에 연결할 수 없음" | 휴대폰/PC가 **로봇과 같은 공유기**에 연결돼 있나요? PC가 유선으로 다른 네트워크에 있거나 Wi-Fi가 꺼져 있으면 접속할 수 없어요. |
+| 시리얼에 "공유기 접속 실패" | 공유기 이름과 비밀번호를 다시 확인하고, 2.4GHz Wi-Fi인지 확인해요. |
+| 어제와 주소가 달라요 | 공유기가 주소를 바꿔 줄 수 있어요. OLED 화면에서 새 주소를 확인해요. |
+| OLED에 `Connecting...`만 계속 보여요 | 공유기에 접속하는 중이에요. 15초가 지나도 안 되면 Otto가 직접 Wi-Fi를 만들고 그 이름과 비밀번호를 보여 줘요. |
+| 걷다가 저절로 멈춰요 | 휴대폰 화면이 꺼지면 3초 뒤 안전하게 멈춰요. 건전지가 약해도 멈출 수 있어요. |
+
+> 💡 **안전 장치:** 화면이 3초 넘게 신호를 보내지 않으면(휴대폰 화면 꺼짐, Wi-Fi 끊김) 로봇이 스스로 멈춰요.<br>
+> ⚠️ 같은 공유기에 접속한 사람은 누구나 주소만 알면 내 로봇을 조종할 수 있어요. 교실에서는 내 로봇 주소를 확인하고 접속해요.
+
+**프로그램 살펴보기**
+
+| 부분 | 하는 일 |
+|---|---|
+| `PAGE` | 브라우저에 보낼 조종판 화면(HTML, SVG, JavaScript)이에요. 원을 누른 위치로 속도를 계산해요. |
+| `handleWalk()` | `/walk?v=속도` 주소로 들어온 속도를 받아요. 0이면 바로 멈춰요. |
+| `walkTask()` | 받은 속도로 `walkFront(속도)`를 계속 불러요. 한 걸음에 약 1초가 걸리니, 그동안에도 화면 명령을 받을 수 있게 따로 돌려요. |
+| `stopNow()` | 걷던 걸음을 끊고 두 발을 멈추고 다리를 가운데(90도)로 돌려놓아요. |
+| `showLcd()` | OLED에 네 줄을 써요. 둘째 줄(접속 주소)은 굵고 크게 보여 줘요. OLED 사용법은 [3.17](#-317-13-oled-lcd-128x64)을 보세요. |
+| `setup()` | OLED를 켜고, 공유기에 접속하고(실패하면 Wi-Fi 만들기), 접속 주소를 OLED에 보여 준 뒤 웹서버를 시작해요. |
+
+> 💡 **다음 단원:** 후진, 좌회전, 우회전은 [4.2 네 방향으로 조종하기](#-42-네-방향으로-조종하기-otto_web_drive)에서 만들어요. 먼저 직접 AI에게 부탁해서 만들어 보고, 4.2의 정답과 비교해 보세요.
+
+<br>
+<details>
+    <summary>💻 휴대폰으로 걷는 속도 조절하기 (otto_web_walk.ino) </summary>
+
+```c
+// Otto 웹 걷기: 인터넷 없이 Otto 가 직접 Wi-Fi 를 만들고, 휴대폰/PC 브라우저로 전진 속도를 조절한다.
+//
+// 사용법
+//  1. 아래 WIFI_SSID, WIFI_PASS 에 공유기(ipTIME 등) 이름과 비밀번호를 넣고 업로드한다.
+//  2. OLED 화면이나 시리얼 모니터(115200)에 나온 주소(예: http://192.168.0.37)를 같은 공유기에 접속한
+//     휴대폰/PC 브라우저에서 연다. http://otto-xxxx.local 처럼 이름으로도 열 수 있다(안드로이드는 안 될 수 있음).
+//  * 공유기 접속에 실패하면 Otto 가 직접 Wi-Fi "Otto-XXXX"(비밀번호 AP_PASS)를 만든다.
+//    그 Wi-Fi 에 접속하면 화면이 자동으로 뜨고, 안 뜨면 http://192.168.4.1 을 연다.
+//  3. 원의 위쪽(전진)을 누르면 걷는다. 가운데에 가까우면 느리게(40), 바깥쪽이면 빠르게(200).
+//     가운데 [정지]를 누르면 멈춘다.
+//
+// 걷기 함수는 이것만 쓴다.
+//   walkFront();      // 보통 속도 (walkFront(100) 과 같아요)
+//   walkFront(60);    // 천천히 걷기
+//   walkFront(150);   // 빠르게 걷기
+//
+// 안전: 화면이 3초 넘게 신호를 보내지 않으면(휴대폰 화면 꺼짐, Wi-Fi 끊김) 스스로 멈춘다.
+// 보정값은 웹 [로봇 맞추기]에서 보드에 저장한 값을 ottoInit() 이 읽어서 쓴다.
+
+#include <WiFi.h>
+#include <WebServer.h>
+#include <DNSServer.h>
+#include <ESPmDNS.h>
+#include <Wire.h>
+#include <U8g2lib.h>
+#include <OttoI2R.h>
+
+// 1.3" OLED (SH1106, I2C: SDA=18, SCL=17) 에 접속 주소를 보여 준다 (가이드 3.17)
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+
+// OLED 에 네 줄을 쓴다: 제목(작게), 주소(크게), 아래 두 줄(작게)
+void showLcd(const String &title, const String &big, const String &line3, const String &line4) {
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.drawStr(0, 10, title.c_str());
+  u8g2.setFont(u8g2_font_7x13B_tf);   // 주소는 굵고 크게 (IP 15자까지 한 줄)
+  u8g2.drawStr(0, 30, big.c_str());
+  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.drawStr(0, 48, line3.c_str());
+  u8g2.drawStr(0, 62, line4.c_str());
+  u8g2.sendBuffer();
+}
+
+// ▼ 공유기 정보를 여기에 넣는다
+const char *WIFI_SSID = "공유기이름";   // 공유기 이름 (SSID)
+const char *WIFI_PASS = "비밀번호";     // 공유기 비밀번호
+const unsigned long WIFI_WAIT_MS = 15000;  // 공유기 접속을 기다리는 시간
+
+// 공유기 접속에 실패했을 때 Otto 가 만드는 Wi-Fi 의 비밀번호 (8자 이상). "" 이면 비밀번호 없음
+const char *AP_PASS = "12345678";
+bool apMode = false;  // true 면 Otto 가 직접 Wi-Fi 를 만든 상태
+
+const int SPEED_MIN = 40;
+const int SPEED_MAX = 200;
+const unsigned long SIGNAL_TIMEOUT_MS = 3000;  // 이 시간 동안 화면 신호가 없으면 멈춤
+
+WebServer server(80);
+DNSServer dns;
+
+volatile int walkSpeed = 0;          // 0 이면 정지, 40~200 이면 그 속도로 전진
+volatile unsigned long lastSignal = 0;  // 마지막으로 화면 신호를 받은 시각
+TaskHandle_t walkHandle = nullptr;    // 걷기 작업 (정지할 때 지운다)
+
+void stopNow();
+
+// ── 화면 (HTML) ─────────────────────────────────────────────
+const char PAGE[] PROGMEM = R"HTML(
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Otto 걷기</title>
+<style>
+  body { margin:0; font-family:sans-serif; background:#f4f6f9; color:#1f2937;
+         display:flex; flex-direction:column; align-items:center; }
+  h1 { font-size:20px; margin:20px 0 4px; }
+  #state { font-size:16px; margin-bottom:12px; color:#475569; }
+  #state b { color:#2563eb; }
+  svg { width:min(92vw,380px); height:auto; touch-action:none; user-select:none; }
+  .small { font-size:11px; fill:#64748b; }
+  .dir { font-size:20px; font-weight:bold; fill:#1f2937; }
+  .off { fill:#cbd5e1; }
+  #msg { height:20px; font-size:13px; color:#94a3b8; margin-top:8px; }
+</style>
+</head>
+<body>
+<h1>Otto 걷기</h1>
+<div id="state">정지</div>
+
+<svg id="pad" viewBox="0 0 320 320">
+  <circle cx="160" cy="160" r="156" fill="#eef1f5"/>
+  <circle cx="160" cy="160" r="140" fill="#fafbfc" stroke="#94a3b8" stroke-width="3"/>
+  <!-- 전진 영역 강조 -->
+  <path d="M160 160 L61 61 A140 140 0 0 1 259 61 Z" fill="#eff6ff"/>
+  <!-- X 선 -->
+  <line x1="61" y1="61" x2="259" y2="259" stroke="#cbd5e1"/>
+  <line x1="259" y1="61" x2="61" y2="259" stroke="#cbd5e1"/>
+  <!-- 느리게/빠르게 경계 점선 -->
+  <circle cx="160" cy="160" r="80" fill="none" stroke="#cbd5e1" stroke-dasharray="4 4"/>
+  <!-- 눌린 위치 -->
+  <circle id="dot" cx="160" cy="160" r="9" fill="#2563eb" opacity="0"/>
+  <!-- 글자 -->
+  <text x="160" y="35" text-anchor="middle" class="small">빠르게 200</text>
+  <path d="M152 46 L160 40 L168 46" fill="none" stroke="#64748b" stroke-width="2.5"/>
+  <text x="160" y="72" text-anchor="middle" class="dir">전진</text>
+  <text x="160" y="102" text-anchor="middle" class="small">느리게 40</text>
+  <text x="60" y="166" text-anchor="middle" class="dir off">좌회전</text>
+  <text x="260" y="166" text-anchor="middle" class="dir off">우회전</text>
+  <text x="160" y="262" text-anchor="middle" class="dir off">후진</text>
+  <!-- 정지 버튼 -->
+  <circle cx="160" cy="160" r="42" fill="#ffe4e6" stroke="#fda4af" stroke-width="4"/>
+  <text x="160" y="168" text-anchor="middle" style="font-size:22px;font-weight:bold;fill:#e11d48">정지</text>
+</svg>
+<div id="msg"></div>
+
+<script>
+const R_STOP = 42, R_OUT = 140, V_MIN = 40, V_MAX = 200;
+const pad = document.getElementById('pad');
+const dot = document.getElementById('dot');
+const state = document.getElementById('state');
+const msg = document.getElementById('msg');
+let speed = 0, sent = -1, lastSend = 0, pressing = false;
+
+// 서보에 보낸다 (같은 값은 0.15초에 한 번만)
+function send(force) {
+  const now = Date.now();
+  if (!force && speed === sent && now - lastSend < 1000) return;
+  if (!force && now - lastSend < 150) return;
+  lastSend = now; sent = speed;
+  fetch('/walk?v=' + speed, { cache: 'no-store' })
+    .then(() => { msg.textContent = ''; })
+    .catch(() => { msg.textContent = '로봇과 연결이 끊겼어요'; });
+}
+
+function show() {
+  state.innerHTML = speed ? '전진 <b>' + speed + '</b>' : '정지';
+  if (!speed) dot.setAttribute('opacity', 0);
+}
+
+// 눌린 위치를 SVG 좌표로 바꿔 속도를 정한다
+function handle(e) {
+  const p = pad.createSVGPoint();
+  p.x = e.clientX; p.y = e.clientY;
+  const q = p.matrixTransform(pad.getScreenCTM().inverse());
+  const dx = q.x - 160, dy = q.y - 160, r = Math.hypot(dx, dy);
+
+  if (r <= R_STOP) { speed = 0; show(); send(true); return; }   // 정지 버튼
+  if (r > R_OUT + 12) return;                                  // 원 바깥
+  if (!(dy < 0 && Math.abs(dx) <= -dy)) {                      // 전진(위쪽) 영역이 아님
+    msg.textContent = '지금은 전진만 할 수 있어요';
+    return;
+  }
+  msg.textContent = '';
+  const t = Math.min(1, (r - R_STOP) / (R_OUT - R_STOP));      // 0(가운데) ~ 1(바깥)
+  speed = Math.round((V_MIN + t * (V_MAX - V_MIN)) / 10) * 10;  // 10 단위
+  dot.setAttribute('cx', q.x); dot.setAttribute('cy', q.y);
+  dot.setAttribute('opacity', 1);
+  show(); send(false);
+}
+
+pad.addEventListener('pointerdown', e => { pressing = true; pad.setPointerCapture(e.pointerId); handle(e); });
+pad.addEventListener('pointermove', e => { if (pressing) handle(e); });
+pad.addEventListener('pointerup', () => { pressing = false; send(true); });
+pad.addEventListener('pointercancel', () => { pressing = false; });
+
+// 걷는 동안 1초마다 "아직 연결돼 있어요" 신호를 보낸다 (끊기면 로봇이 3초 뒤 스스로 멈춤)
+setInterval(() => { if (speed) send(true); }, 1000);
+</script>
+</body>
+</html>
+)HTML";
+
+// ── 웹 요청 처리 ────────────────────────────────────────────
+void handleRoot() {
+  server.send_P(200, "text/html; charset=utf-8", PAGE);
+}
+
+// /walk?v=속도  (0 이면 정지)
+void handleWalk() {
+  int v = server.arg("v").toInt();
+  if (v != 0) v = constrain(v, SPEED_MIN, SPEED_MAX);
+  lastSignal = millis();
+  if (v == 0) {
+    stopNow();  // 걸음이 끝나기를 기다리지 않고 바로 멈춘다
+  } else {
+    if (v != walkSpeed) Serial.printf("속도: %d\n", v);
+    walkSpeed = v;
+  }
+  server.send(200, "text/plain", "ok");
+}
+
+// 모르는 주소 처리
+//  - Otto 가 만든 Wi-Fi 일 때: 휴대폰이 인터넷 확인용으로 여는 주소를 첫 화면으로 보낸다 (화면 자동으로 뜨기)
+//  - 공유기에 접속했을 때: 그냥 "없음"
+void handleOther() {
+  if (apMode) {
+    server.sendHeader("Location", "http://192.168.4.1/", true);
+    server.send(302, "text/plain", "");
+  } else {
+    server.send(404, "text/plain", "not found");
+  }
+}
+
+// ── 걷기 (따로 도는 작업) ───────────────────────────────────
+// walkFront() 는 한 걸음에 약 1초 걸린다. 그동안에도 웹 요청을 받도록 걷기는 따로 돌린다.
+void walkTask(void *) {
+  for (;;) {
+    int v = walkSpeed;
+    if (v > 0 && millis() - lastSignal > SIGNAL_TIMEOUT_MS) {
+      Serial.println("화면 신호가 끊겨서 멈춤");
+      walkSpeed = 0;
+      v = 0;
+    }
+    if (v > 0) {
+      walkFront(v);
+    } else {
+      delay(20);
+    }
+  }
+}
+
+void startWalkTask() {
+  xTaskCreatePinnedToCore(walkTask, "walk", 4096, nullptr, 1, &walkHandle, 1);
+}
+
+// [정지]: 걷던 걸음을 그 자리에서 끊고, 두 발을 정지 신호(1.5ms)로, 다리를 가운데(90도)로 둔다.
+// walkFront() 는 한 걸음(약 1초)이 끝나야 돌아오므로, 걷기 작업을 지우고 새로 만든다.
+void stopNow() {
+  walkSpeed = 0;
+  if (walkHandle) {
+    vTaskDelete(walkHandle);
+    walkHandle = nullptr;
+  }
+  ottoRollFeet(0, 0);  // 두 발 모두 1.5ms 정지 신호
+  writeYL(90);         // 다리를 가운데로
+  writeYR(90);
+  Serial.println("정지");
+  startWalkTask();     // 다음 명령을 받을 수 있게 걷기 작업을 다시 만든다
+}
+
+void setup() {
+  Serial.begin(115200);
+  ottoInit();  // 저장된 보정값을 읽고 다리를 가운데로
+
+  Wire.begin(18, 17);  // OLED I2C: SDA=18, SCL=17
+  u8g2.begin();
+  showLcd("Otto Web Walk", "Connecting...", String("WiFi: ") + WIFI_SSID, "");
+
+  // 이름 끝 4글자는 보드마다 다르다 (MAC 주소). Wi-Fi 이름과 .local 이름에 쓴다
+  String mac = WiFi.macAddress();
+  mac.replace(":", "");
+  String tail = mac.substring(8);
+  tail.toLowerCase();
+
+  // 1) 공유기에 접속한다
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  Serial.printf("공유기 '%s' 에 접속 중", WIFI_SSID);
+  unsigned long start = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - start < WIFI_WAIT_MS) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println();
+
+  IPAddress ip;
+  if (WiFi.status() == WL_CONNECTED) {
+    ip = WiFi.localIP();
+    String host = "otto-" + tail;
+    MDNS.begin(host.c_str());  // http://otto-xxxx.local 로도 열 수 있게
+    MDNS.addService("http", "tcp", 80);
+    Serial.println("공유기 접속 성공");
+    Serial.println("주소: http://" + ip.toString());
+    Serial.println("이름 주소: http://" + host + ".local");
+    showLcd("Open in browser:", ip.toString(), String("WiFi: ") + WIFI_SSID, host + ".local");
+  } else {
+    // 2) 실패하면 Otto 가 직접 Wi-Fi 를 만든다
+    apMode = true;
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_AP);
+    String ssid = "Otto-" + mac.substring(8);  // 예: Otto-A1B2
+    WiFi.softAP(ssid.c_str(), strlen(AP_PASS) >= 8 ? AP_PASS : nullptr);
+    delay(100);
+    ip = WiFi.softAPIP();
+    dns.start(53, "*", ip);  // 모든 주소를 Otto 로 → 접속하면 화면이 자동으로 뜬다
+    Serial.println("공유기 접속 실패: Otto 가 직접 Wi-Fi 를 만듭니다");
+    Serial.println("Wi-Fi 이름: " + ssid);
+    Serial.printf("비밀번호: %s\n", strlen(AP_PASS) >= 8 ? AP_PASS : "(없음)");
+    Serial.println("주소: http://" + ip.toString());
+    showLcd("Open in browser:", ip.toString(), "WiFi: " + ssid,
+            String("PW: ") + (strlen(AP_PASS) >= 8 ? AP_PASS : "(none)"));
+  }
+
+  server.on("/", handleRoot);
+  server.on("/walk", handleWalk);
+  server.onNotFound(handleOther);
+  server.begin();
+
+  startWalkTask();
+}
+
+void loop() {
+  if (apMode) dns.processNextRequest();
+  server.handleClient();
+  delay(2);
+}
+```
+</details>
+
+-----------
+### ✅ 4.2 네 방향으로 조종하기 (otto_web_drive)
+
+4.1의 조종판은 전진만 됐어요. 이번에는 **후진, 좌회전, 우회전**도 되게 해요.
+
+- 원의 네 구역 중 하나를 누르면 그 방향으로 **정지할 때까지 계속** 걸어요. 누른 구역은 파란색이 돼요.
+- **전진과 후진**은 4.1처럼 가운데에 가까우면 느리게(40), 바깥쪽이면 빠르게(200) 걸어요.
+- **좌회전과 우회전**은 `walkLeft()`, `walkRight()`로 걸으면서 돌아요. (속도 조절 없음)
+- 걷는 중에 다른 방향을 누르면 먼저 멈추고 다리를 가운데로 둔 뒤 새 방향으로 걸어요.
+
+**AI에게 말하기**
+
+```
+나는 Otto I2R 로봇을 가지고 있어.
+먼저 https://raw.githubusercontent.com/kdi6033/otto/main/AGENTS.md 를 읽고, 거기 적힌 핀과 규칙과 함수만 써서 아두이노 코드를 만들어 줘.
+나는 초보자니까 코드는 처음부터 끝까지 전체를 주고, 무엇을 하는 코드인지 쉽게 설명해 줘.
+
+지금 코드: https://raw.githubusercontent.com/kdi6033/otto/main/examples/otto_web_walk/otto_web_walk.ino
+만들고 싶은 것: 이 코드의 원형 조종판에서 후진, 좌회전, 우회전도 되게 해 줘.
+후진은 전진처럼 누른 위치로 속도(40~200)를 바꾸고, 회전은 walkLeft(), walkRight()를 써 줘.
+명령 주소는 /move?a=wf&v=속도 처럼 하고, 동작 코드는 wf(전진) wb(후진) wl(좌회전) wr(우회전), 정지는 a=stop 으로 해 줘.
+다른 방향을 누르면 먼저 멈추고 다리를 가운데로 둔 뒤 새 방향으로 걷게 해 줘.
+```
+
+**정답 예제:** [examples/otto_web_drive/otto_web_drive.ino](../examples/otto_web_drive/otto_web_drive.ino)
+(파일을 열고 오른쪽 위의 복사 버튼을 눌러 Arduino IDE에 붙여 넣어요. 공유기 이름과 비밀번호는 4.1처럼 바꿔요.)
+
+**확인할 것**
+
+| 누르는 곳 | 로봇 |
+|---|---|
+| 위쪽(전진), 가운데 가까이 | 천천히 앞으로 걸어요 |
+| 위쪽(전진), 바깥쪽 | 빠르게 앞으로 걸어요 |
+| 아래쪽(후진) | 뒤로 걸어요 |
+| 왼쪽 / 오른쪽 | 걸으면서 왼쪽 / 오른쪽으로 돌아요 |
+| 가운데 [정지] | 바로 멈추고 다리를 가운데로 둬요 |
+
+**4.1에서 바뀐 부분**
+
+1. 명령 주소가 `/walk?v=속도`에서 **`/move?a=동작&v=속도`** 로 바뀌었어요. 동작 이름은 i2r.link 앱과 같아요.
+   ```
+   휴대폰 브라우저 ──(공유기)──▶ Otto 웹서버
+     전진 누름      /move?a=wf&v=120    walkFront(120)
+     후진 누름      /move?a=wb&v=80     walkBack(80)
+     좌회전 누름    /move?a=wl          walkLeft()
+     [정지]         /move?a=stop        바로 멈추기
+   ```
+2. 동작 이름을 배열에 모아 두고, 순서(번호)로 어떤 함수를 부를지 정해요.
+   ```c
+   const char *ACTIONS[] = { "wf", "wb", "wl", "wr" };   // 0 전진, 1 후진, 2 좌회전, 3 우회전
+
+   switch (a) {
+     case 0:  walkFront(v); break;
+     case 1:  walkBack(v);  break;
+     case 2:  walkLeft();   break;
+     case 3:  walkRight();  break;
+     default: delay(20);    break;   // -1 이면 정지
+   }
+   ```
+3. `handleMove()`는 **다른 동작이 들어오면 `stopNow()`로 먼저 멈춘 뒤** 새 동작을 시작해요. 같은 동작이면 속도만 바꿔요.
+4. 화면(`PAGE`)은 누른 위치의 각도로 네 구역 중 하나를 고르고, 누른 구역을 파란색으로 칠해요.
+5. 이름이 `otto-0000.local`로 나오던 문제를 고쳤어요. MAC 주소를 읽기 전에 `WiFi.mode(WIFI_STA);`로 Wi-Fi를 먼저 켜요.
+
+-----------
+### ✅ 4.3 걷기, 굴리기, 미끄러짐 모드 고르기 (otto_web_modes)
+
+i2r.link 조종 화면 맨 위에 있는 **[걷기 (walk)] [굴리기 (roll)] [미끄러짐 (slide)]** 버튼을 만들어요. 같은 네 방향이라도 모드에 따라 다른 동작을 해요.
+
+| | 전진 | 후진 | 좌회전 | 우회전 |
+|---|---|---|---|---|
+| 걷기 | `walkFront(v)` | `walkBack(v)` | `walkLeft()` | `walkRight()` |
+| 굴리기 | `rollingFront(v)` | `rollingBack(v)` | `rollingLeft()` | `rollingRight()` |
+| 미끄러짐 | `slideFront()` | `slideBack()` | `slideLeft()` | `slideRight()` |
+
+- 걷기와 굴리기의 **전진, 후진**은 누른 위치로 속도(40~200)가 바뀌어요. 나머지는 기본 속도예요.
+- 모드를 바꾸면 로봇이 먼저 멈춰요.
+
+> ⚠️ 굴리기는 빠르게 굴러가요. 탁자 위에서 시험하지 말고 바닥에서 해요.
+
+**AI에게 말하기**
+
+```
+나는 Otto I2R 로봇을 가지고 있어.
+먼저 https://raw.githubusercontent.com/kdi6033/otto/main/AGENTS.md 를 읽고, 거기 적힌 핀과 규칙과 함수만 써서 아두이노 코드를 만들어 줘.
+나는 초보자니까 코드는 처음부터 끝까지 전체를 주고, 무엇을 하는 코드인지 쉽게 설명해 줘.
+
+지금 코드: https://raw.githubusercontent.com/kdi6033/otto/main/examples/otto_web_drive/otto_web_drive.ino
+만들고 싶은 것: 조종판 위에 [걷기] [굴리기] [미끄러짐] 모드 버튼 3개를 만들어 줘.
+굴리기는 rollingFront/Back/Left/Right, 미끄러짐은 slideFront/Back/Left/Right 를 쓰고, 동작 코드는 rf rb rl rr, sf sb sl sr 로 해 줘.
+걷기와 굴리기의 전진, 후진만 속도를 쓰고, 모드를 바꾸면 먼저 멈춰 줘.
+굴리기는 발이 계속 도니까, 정지하거나 화면 신호가 끊기면 발도 꼭 멈춰 줘.
+```
+
+**정답 예제:** [examples/otto_web_modes/otto_web_modes.ino](../examples/otto_web_modes/otto_web_modes.ino)
+
+**확인할 것**
+
+| 해 볼 것 | 로봇 |
+|---|---|
+| [굴리기] → 전진 | 다리를 굴리기 자세로 바꾼 뒤(약 1초) 앞으로 굴러가요 |
+| [굴리기] → 좌회전 | 제자리에서 왼쪽으로 돌아요 |
+| [미끄러짐] → 전진 | 좌우 교대로 스케이트 타듯 앞으로 가요 |
+| 굴러가는 중에 [걷기] 누르기 | 멈추고 다리를 가운데로 둬요. 굴리기 자세 그대로 걷지 않아요 |
+| 굴러가는 중에 휴대폰 화면 끄기 | 3초 뒤 발이 멈춰요 |
+
+**4.2에서 바뀐 부분**
+
+1. 화면 위에 모드 버튼 3개가 생겼고, 보내는 동작 코드는 **모드 글자 + 방향 글자**예요. (`w`걷기 `r`굴리기 `s`미끄러짐 + `f` `b` `l` `r`)
+2. 동작 이름이 4개에서 12개로 늘었어요.
+   ```c
+   const char *ACTIONS[] = {
+     "wf", "wb", "wl", "wr",   // 0~3  걷기
+     "rf", "rb", "rl", "rr",   // 4~7  굴리기
+     "sf", "sb", "sl", "sr",   // 8~11 미끄러짐
+   };
+   ```
+3. 굴리기 함수는 발을 돌려 두고 **바로 돌아와요**. 그래서 부른 뒤 잠깐(`delay(50)`) 쉬고 다시 불러요.
+   ```c
+   case 4:  rollingFront(v); delay(50); break;
+   ```
+4. 굴리기는 발이 계속 돌기 때문에, 화면 신호가 끊겼을 때도 `restPose()`로 **발을 멈추고** 다리를 가운데로 둬요. (4.1은 걷기만 있어서 걸음만 멈추면 됐어요)
