@@ -62,15 +62,15 @@ void showLcd(const String &title, const String &big, const String &line3, const 
 
 // ── 눈 그리기 ───────────────────────────────────────────────
 const int EYE_LX = 32, EYE_RX = 96, EYE_Y = 32;  // 왼쪽/오른쪽 눈 가운데
-const int EYE_R = 20;                            // 눈 크기
-const int PUPIL_R = 7;                           // 눈동자 크기
+const int EYE_R = 24;                            // 눈 크기 (화면 높이 64 안에 들어가게 24까지)
+const int PUPIL_R = 12;                          // 눈동자 크기
 
 // 뜬 눈: 동그라미 + 눈동자(검은 점) + 반짝이는 점
 void drawOpenEye(int cx, int cy, int px, int py) {
   u8g2.drawCircle(cx, cy, EYE_R);
   u8g2.drawDisc(cx + px, cy + py, PUPIL_R);
   u8g2.setDrawColor(0);
-  u8g2.drawDisc(cx + px + 2, cy + py - 3, 2);    // 반짝임
+  u8g2.drawDisc(cx + px + 4, cy + py - 4, 3);    // 반짝임
   u8g2.setDrawColor(1);
 }
 
@@ -489,14 +489,16 @@ void eyeTask(void *) {
       if (a >= 0) {
         // 움직이는 방향을 본다 (0 전진, 1 후진, 2 좌회전, 3 우회전)
         int d = a % 4;
-        tx = (d == 2) ? -10 : (d == 3) ? 10 : 0;
-        ty = (d == 0) ? -7 : (d == 1) ? 7 : 0;
+        tx = (d == 2) ? -10 : (d == 3) ? 10 : 0;   // 눈동자가 눈 밖으로 나가지 않게 (24 - 12 - 2 = 10)
+        ty = (d == 0) ? -9 : (d == 1) ? 9 : 0;
       } else if ((long)(now - nextLook) >= 0) {
         // 가만히 있을 때는 이따금 여기저기 둘러본다
         tx = random(-10, 11);
-        ty = random(-7, 8);
+        ty = random(-9, 10);
         nextLook = now + random(600, 2000);
       }
+      float dist = sqrt(tx * tx + ty * ty);     // 대각선으로도 눈 밖으로 나가지 않게 10 이내로
+      if (dist > 10) { tx = tx * 10 / dist; ty = ty * 10 / dist; }
       px += (tx - px) * 0.3;         // 부드럽게 따라간다
       py += (ty - py) * 0.3;
 
