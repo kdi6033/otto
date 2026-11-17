@@ -210,6 +210,7 @@ moveHip(90, 90);              // 서 있는 자세로 돌아온다
 | otto_web_walk | 로봇에 웹서버를 만들어 휴대폰으로 걷기 속도 조절 (Wi-Fi, 가이드 4.1.1) |
 | otto_web_modes | 웹 조종판에 네 방향과 [걷기] [굴리기] [미끄러짐] 모드 버튼. 원의 위치로 속도가 끊김 없이 바뀜. 명령 `/move?a=wf&v=속도`, 동작 코드 12개 (가이드 4.1.2 1단계) |
 | otto_web_eyes | otto_web_modes + OLED 눈: 부팅 시 정보 5초, 움직이는 눈, 5초 정지면 잠자는 눈, Wi-Fi 없으면 찡그린 눈 (가이드 4.1.2 2단계). 4장 다음 기능은 이 예제에 덧붙인다 |
+| otto_web_calib | otto_web_eyes + [로봇 맞추기] 화면: 조립 자세(0/180도), 다리 수직(YL/YR us), 굴리기 속도, 걷기 기울기, 왼발/오른발 댄스 각도를 웹에서 맞추고 [저장(NVS)] [값 복사] [기본값으로]. 웹 화면은 `page.h`에 따로 둔다 (.ino 안의 긴 HTML 속 JavaScript를 Arduino가 C++로 잘못 읽어 `'function' does not name a type` 오류가 나기 때문) |
 | oled_hello, oled_korean, oled_eyes, oled_sleepy_eyes | OLED 글자, 한글, 눈 그래픽 |
 | led_basic, led_effects | LED 링 색과 효과 |
 | distance_vl53l0x | 거리 센서 읽기 |
