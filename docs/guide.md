@@ -2839,6 +2839,8 @@ void loop() {
 
 #### 4.1.2 네 방향과 걷기, 굴리기, 미끄러짐 모드 (otto_web_modes)
 
+[![유튜브 보기](https://img.shields.io/badge/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EB%B3%B4%EA%B8%B0-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/jAo5lp99mw0) [**AI로 만드는 Otto 웹 조종 2탄 – 걷기·굴리기·미끄러짐 3모드, 4방향 속도 제어, OLED 눈동자 표정**](https://youtu.be/jAo5lp99mw0)
+
 i2r.link 조종 화면처럼 **[걷기 (walk)] [굴리기 (roll)] [미끄러짐 (slide)]** 버튼을 만들고, 전진, 후진, 좌회전, 우회전이 모두 되게 해요.
 그다음 OLED 화면에 **눈**을 그려서 로봇의 상태를 표정으로 보여 줘요. 두 단계로 나누어 만들어요.
 
