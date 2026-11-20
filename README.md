@@ -80,9 +80,13 @@
 내가 설치하는 것은 **Git, VS Code, Claude Code 확장** 3개뿐입니다. 빈 폴더를 VS Code로 열고 Claude에게 아래처럼 말하면, 저장소 내려받기와 컴파일 도구·라이브러리 설치까지 Claude가 합니다.
 
 ```
-https://github.com/kdi6033/otto 저장소를 이 폴더에 내려받고,
-그 안의 CLAUDE.md를 읽은 다음 Otto 개발 환경을 만들어 줘.
+https://github.com/kdi6033/i2r 읽고 i2r 개발을 도와줘. otto 개발 환경을 만들어 줘
 ```
+
+Claude가 이 저장소를 받고 개발 환경을 만듭니다. 이때 내 PC에 **i2r 스킬**을 설치해 두면(Claude가 물어봄), 그다음부터는 어느 폴더에서나 **"otto 개발을 도와줘"** 라고만 말하면 됩니다.
+PLC, Otto, 시뮬레이터 모두 같은 한 줄로 시작합니다. ([i2r 안내판](https://github.com/kdi6033/i2r))
+
+> 예전 문장도 계속 됩니다: `https://github.com/kdi6033/otto 저장소를 이 폴더에 내려받고, 그 안의 CLAUDE.md를 읽은 다음 Otto 개발 환경을 만들어 줘.`
 
 그다음부터는 Claude가 [CLAUDE.md](CLAUDE.md)를 읽고 **코드 작성, 컴파일, 업로드, 시리얼 확인**까지 직접 합니다.
 나는 원하는 동작을 말하고, 로봇이 어떻게 움직였는지 알려 주기만 하면 됩니다.

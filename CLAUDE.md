@@ -4,6 +4,8 @@
 
 @AGENTS.md
 
+i2r 전체 안내판(다른 키트, 작업 폴더, i2r 스킬)은 https://raw.githubusercontent.com/kdi6033/i2r/main/AGENTS.md 에 있습니다. 사용자가 이 키트가 아닌 것(다른 키트, 시뮬레이터)을 원하면 안내판 1장과 4장을 따릅니다.
+
 ## Claude Code에서 일하는 순서
 
 사용자가 "~하는 로봇을 만들어 줘"라고 하면 아래 순서로 진행합니다.
