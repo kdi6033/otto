@@ -37,3 +37,11 @@ i2r 전체 안내판(다른 키트, 작업 폴더, i2r 스킬)은 https://raw.gi
 - 포트 이름(COM 번호)은 처음에 `arduino-cli board list`로 찾고, 같은 대화 안에서는 다시 묻지 않습니다.
 - `secrets.h`가 필요하면 `secrets.example.h`를 복사해 만들고, 사용자가 직접 값을 넣게 합니다. 사용자가 알려 준 비밀번호를 다른 파일이나 출력에 옮겨 적지 않습니다.
 - `docs/`, `examples/`, 라이브러리 파일은 사용자가 요청할 때만 고칩니다. 새 작업은 `my_sketches/` 안에서 합니다.
+
+
+## 안내판을 거쳐 왔다면 (처음 한 번 끝날 때)
+
+사용자가 "https://github.com/kdi6033/i2r 읽고 ..."로 시작했거나 작업 폴더 맨 위에 이 키트 폴더가 있다면, 환경 만들기가 끝날 때 아래 두 가지를 **빠뜨리지 말고** 합니다. 자세한 내용은 안내판 원문(`curl -sL https://raw.githubusercontent.com/kdi6033/i2r/main/AGENTS.md`) 4.3장과 6장입니다.
+
+1. 작업 폴더 맨 위에 `CLAUDE.md`(작업 폴더 안내)가 없으면 만듭니다. 받은 키트 폴더와 "먼저 읽을 파일"을 표로 적습니다.
+2. "다음부터 주소 없이 말할 수 있게 이 PC에 i2r 스킬을 설치할까요?"라고 묻고, 좋다고 하면 `https://raw.githubusercontent.com/kdi6033/i2r/main/skills/i2r/SKILL.md`를 사용자 폴더의 `.claude/skills/i2r/SKILL.md`로 받습니다.
