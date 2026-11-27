@@ -14,7 +14,7 @@ i2r 전체 안내판(다른 키트, 작업 폴더, i2r 스킬)은 https://raw.gi
    1. `git --version`으로 Git 확인 (없으면 https://git-scm.com 설치를 안내)
    2. AGENTS.md 7장 ①로 arduino-cli 확인, 없으면 winget으로 설치 (Arduino IDE는 필요 없음)
    3. esp32 보드 패키지 설치 (오래 걸린다고 미리 알림)
-   4. 라이브러리 설치: OttoI2R FastLED@3.10.3 U8g2 Adafruit_VL53L0X BH1750 (FastLED는 3.10.3으로 고정, AGENTS.md 7장 ①)
+   4. 라이브러리 설치: OttoI2R FastLED U8g2 Adafruit_VL53L0X BH1750
    5. `my_sketches/hello_otto` 컴파일로 확인
    6. 끝나면 "✅ 개발 환경 준비 완료"와 설치한 것 목록을 보여 주고, 로봇을 USB로 연결하라고 안내
 2. **계획을 짧게 말하기**: 어떤 함수와 장치를 쓸지 2~3줄로 말합니다. 비슷한 예제가 있으면 먼저 읽습니다.
