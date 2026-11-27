@@ -74,7 +74,7 @@ FQBN = esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PSRAM=opi,PartitionScheme
 | 라이브러리 | arduino-cli 설치 이름 | 언제 |
 |---|---|---|
 | OttoI2R | `OttoI2R` | 항상 (서보 동작) |
-| FastLED | `FastLED` | LED 링 |
+| FastLED | `FastLED@3.10.3` (이 버전으로 고정) | LED 링 |
 | U8g2 | `U8g2` | OLED |
 | Adafruit VL53L0X | `Adafruit_VL53L0X` | 거리 센서 |
 | BH1750 | `BH1750` | 조도 센서 |
@@ -210,7 +210,7 @@ moveHip(90, 90);              // 서 있는 자세로 돌아온다
 | otto_web_walk | 로봇에 웹서버를 만들어 휴대폰으로 걷기 속도 조절 (Wi-Fi, 가이드 4.1.1) |
 | otto_web_modes | 웹 조종판에 네 방향과 [걷기] [굴리기] [미끄러짐] 모드 버튼. 원의 위치로 속도가 끊김 없이 바뀜. 명령 `/move?a=wf&v=속도`, 동작 코드 12개 (가이드 4.1.2 1단계) |
 | otto_web_eyes | otto_web_modes + OLED 눈: 부팅 시 정보 5초, 움직이는 눈, 5초 정지면 잠자는 눈, Wi-Fi 없으면 찡그린 눈 (가이드 4.1.2 2단계). 4장 다음 기능은 이 예제에 덧붙인다 |
-| otto_web_calib | otto_web_eyes + [로봇 맞추기] 화면: 조립 자세(0/180도), 다리 수직(YL/YR us), 굴리기 속도, 걷기 기울기, 왼발/오른발 댄스 각도를 웹에서 맞추고 [저장(NVS)] [값 복사] [기본값으로]. 웹 화면은 `page.h`에 따로 둔다 (.ino 안의 긴 HTML 속 JavaScript를 Arduino가 C++로 잘못 읽어 `'function' does not name a type` 오류가 나기 때문) |
+| otto_web_calib | otto_web_eyes + [로봇 맞추기] 화면: 조립 자세(0/180도), 다리 수직(YL/YR us), 굴리기 속도, 걷기 기울기, 왼발/오른발 댄스 각도를 웹에서 맞추고 [저장 (보드)] [값 복사] [기본값으로]. 화면은 otto.local과 같은 모양(값마다 [−] [+], [앞으로 굴리기 3초] [걷기 4초])이다. 웹 화면은 `page.h`에 따로 둔다 (.ino 안의 긴 HTML 속 JavaScript를 Arduino가 C++로 잘못 읽어 `'function' does not name a type` 오류가 나기 때문) |
 | oled_hello, oled_korean, oled_eyes, oled_sleepy_eyes | OLED 글자, 한글, 눈 그래픽 |
 | led_basic, led_effects | LED 링 색과 효과 |
 | distance_vl53l0x | 거리 센서 읽기 |
@@ -240,8 +240,10 @@ arduino-cli version
 ```bash
 arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
 arduino-cli core install esp32:esp32 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
-arduino-cli lib install OttoI2R FastLED U8g2 Adafruit_VL53L0X BH1750
+arduino-cli lib install OttoI2R FastLED@3.10.3 U8g2 Adafruit_VL53L0X BH1750
 ```
+
+- FastLED는 **3.10.3으로 고정**합니다. 3.10.9 이상에서는 ESP32-S3에서 LED 색이 처음 한 번만 바뀌고 그 뒤로 바뀌지 않는 문제가 있었습니다. 다른 버전이 이미 깔려 있으면 위 명령이 3.10.3으로 바꿔 줍니다. Arduino IDE가 FastLED 업데이트를 권해도 올리지 않습니다.
 
 **② 컴파일**
 
@@ -285,6 +287,7 @@ arduino-cli upload -p COM5 --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16
 | `ESP32Servo` 관련 오류 | ESP32Servo를 쓰지 않습니다. OttoI2R 함수로 바꿈 |
 | 컴파일 오류 `xxx.h: No such file` | 2장 표의 라이브러리를 설치 |
 | OLED가 안 켜짐 | `Wire.begin(18, 17)`을 불렀는지, SH1106용 생성자를 썼는지 확인 |
+| LED 색이 처음 한 번만 바뀌고 그 뒤로 그대로 | **FastLED 버전 문제**. `arduino-cli lib install FastLED@3.10.3`으로 바꾼 뒤 다시 컴파일하고 올림. 코드 문제가 아님 |
 
 ## 9. 공식 펌웨어로 되돌리기
 

@@ -45,26 +45,19 @@ const char PAGE[] PROGMEM = R"HTML(
                 border-top:3px solid transparent; border-bottom:3px solid transparent; }
   #closeCal { margin-left:auto; border:1px solid #cbd5e1; background:#f1f5f9; border-radius:8px;
               padding:6px 12px; font-size:13px; font-weight:bold; cursor:pointer; }
-  #cal h3 { font-size:14px; margin:16px 0 4px; }
-  #cal h4 { font-size:13px; margin:12px 0 4px; }
-  .desc { font-size:12px; color:#64748b; margin:2px 0 8px; line-height:1.5; }
-  .btns { display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 8px; }
-  .b { border:none; border-radius:8px; padding:10px 16px; color:#fff; font-size:13px; font-weight:bold; cursor:pointer; }
-  .teal { background:#0e95a8; } .green { background:#16a34a; } .orange { background:#f59e0b; }
-  .blue { background:#3b82f6; } .gray { background:#64748b; } .red { background:#ef4444; }
-  .row { display:flex; align-items:center; gap:6px; margin:6px 0; }
-  .row > span { width:150px; font-size:13px; flex-shrink:0; }
-  .row input[type=range] { flex:1; min-width:60px; accent-color:#2563eb; }
-  .row b { width:64px; text-align:right; font-size:13px; flex-shrink:0; }
-  .st { border:1px solid #c7d2fe; background:#eef2ff; color:#1e3a8a; border-radius:6px;
-        padding:4px 7px; font-size:12px; cursor:pointer; flex-shrink:0; }
-  #calState, #calNow { font-size:12px; color:#475569; }
+  .sub { font-size:13px; color:#64748b; }
+  .step { border-left:4px solid #3b82f6; padding-left:10px; margin:14px 0; }
+  .step > b { display:block; margin-bottom:4px; font-size:14px; }
+  .btn { border:0; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:700; cursor:pointer;
+         background:#3b82f6; color:#fff; margin:3px; }
+  .btn.gray { background:#e2e8f0; color:#334155; } .btn.red { background:#ef4444; } .btn.green { background:#16a34a; }
+  .row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:6px 0; }
+  .row label { min-width:130px; font-size:13px; color:#475569; }
+  .row input[type=range] { flex:1; min-width:140px; accent-color:#2563eb; }
+  .num { min-width:56px; text-align:right; font-weight:800; font-size:14px; }
+  #calState { font-size:13px; color:#475569; min-height:1em; margin-top:4px; }
   #calNote { font-size:11px; color:#94a3b8; margin-top:8px; }
-  @media (max-width:560px) {
-    #cal { padding:14px 12px; }
-    .row { flex-wrap:wrap; }
-    .row > span { width:100%; }
-  }
+  @media (max-width:560px) { #cal { padding:14px 12px; } }
 </style>
 </head>
 <body>
@@ -123,47 +116,36 @@ const char PAGE[] PROGMEM = R"HTML(
     <a class="yt" href="https://youtu.be/_-mYb3v9v7k" target="_blank"><i></i>유튜브 보기</a>
     <button id="closeCal">닫기</button>
   </div>
+  <p class="sub">값을 바꾸면 바로 로봇에 반영됩니다. 다 맞추면 [저장]을 눌러 보드에 기록하세요.</p>
+
+  <div class="step"><b>1. 조립 자세</b>
+    <button class="btn" data-act="p0">0도 / 180도 (다리 끼우기)</button><button class="btn" data-act="p90">90도 (가운데)</button></div>
+
+  <div class="step"><b>2. 다리 수직</b>
+    <div class="row" data-k="yl" data-min="1000" data-max="1900" data-step="5"><label>왼쪽 다리 YL (us)</label></div>
+    <div class="row" data-k="yr" data-min="1000" data-max="1900" data-step="5"><label>오른쪽 다리 YR (us)</label></div></div>
+
+  <div class="step"><b>3. 굴리기 시험 (두 발 속도)</b>
+    <div class="row" data-k="rl" data-min="0" data-max="600" data-step="5"><label>왼발 속도 (us)</label></div>
+    <div class="row" data-k="rr" data-min="0" data-max="600" data-step="5"><label>오른발 속도 (us)</label></div>
+    <button class="btn" data-act="cr" data-sec="3">앞으로 굴리기 3초</button></div>
+
+  <div class="step"><b>4. 걷기 시험 (발을 들 때 기울기)</b>
+    <div class="row" data-k="tr" data-min="0" data-max="45" data-step="1"><label>오른발 들 때 (도)</label></div>
+    <div class="row" data-k="tl" data-min="0" data-max="45" data-step="1"><label>왼발 들 때 (도)</label></div>
+    <button class="btn" data-act="cw" data-sec="4">걷기 4초</button></div>
+
+  <div class="step"><b>5. 댄스 시험 (한 발로 설 때 엉덩이 각도)</b>
+    <div class="row" data-k="ryr" data-min="0" data-max="135" data-step="1"><label>왼발 서기 YR (도)</label></div>
+    <div class="row" data-k="ryl" data-min="55" data-max="180" data-step="1"><label>왼발 서기 YL (도)</label></div>
+    <div class="row" data-k="lyr" data-min="0" data-max="135" data-step="1"><label>오른발 서기 YR (도)</label></div>
+    <div class="row" data-k="lyl" data-min="55" data-max="180" data-step="1"><label>오른발 서기 YL (도)</label></div>
+    <button class="btn" data-act="dl">왼발 댄스</button><button class="btn" data-act="dr">오른발 댄스</button><button class="btn gray" data-act="stop">정지</button></div>
+
+  <div class="row">
+    <button class="btn green" id="calSave">저장 (보드)</button><button class="btn gray" id="calCopy">값 복사</button>
+    <button class="btn red" id="calReset">기본값으로</button><span class="sub" id="calSaved"></span></div>
   <div id="calState">보드의 현재 값을 읽는 중... (응답이 없으면 보드가 켜져 있고 연결됐는지 확인하세요)</div>
-
-  <h3>1. 조립 자세 (다리 0도 / 180도)</h3>
-  <div class="desc">이 자세로 다리를 끼우고 나사를 조이세요. (오른쪽 다리 0도, 왼쪽 다리 180도)</div>
-  <div class="btns"><button class="b teal" data-act="p0">모터를 0도 / 180도로 움직이기</button></div>
-
-  <h3>2. 다리를 수직(90도)으로 맞추기</h3>
-  <div class="desc">[모터를 90도로 움직이기]를 누른 뒤, 두 다리가 정확히 수직이 되도록 숫자를 조금씩 바꾸세요. 바꾸는 즉시 다리가 움직입니다.</div>
-  <div class="btns"><button class="b teal" data-act="p90">모터를 90도로 움직이기</button></div>
-  <div class="row" data-k="yl" data-min="1000" data-max="1900" data-big="10" data-unit="us"><span>왼쪽 다리 (YL)</span></div>
-  <div class="row" data-k="yr" data-min="1000" data-max="1900" data-big="10" data-unit="us"><span>오른쪽 다리 (YR)</span></div>
-
-  <h3>3. 굴리기 시험 (두 발 속도)</h3>
-  <div class="desc">앞으로 굴리면서 로봇이 똑바로 가도록 두 발의 속도를 맞추세요.</div>
-  <div class="btns"><button class="b green" data-act="cr">앞으로 굴리기</button><button class="b orange" data-act="stop">정지</button></div>
-  <div class="row" data-k="rl" data-min="0" data-max="600" data-big="10" data-unit="us"><span>왼발 속도 (RL)</span></div>
-  <div class="row" data-k="rr" data-min="0" data-max="600" data-big="10" data-unit="us"><span>오른발 속도 (RR)</span></div>
-
-  <h3>4. 걷기 시험 (발을 들 때 기울기)</h3>
-  <div class="desc">[걷기 시작]으로 앞으로 걷게 하고, 걸을 때 발이 수평으로 들리도록 기울기를 조금씩 바꾸세요. 로봇이 안 들리면 올리고, 한쪽으로 돌면 그쪽을 더 올립니다. (먼저 2번에서 다리 수직을 맞추세요)</div>
-  <div class="btns"><button class="b green" data-act="cw">걷기 시작</button><button class="b orange" data-act="stop">정지</button></div>
-  <div class="row" data-k="tr" data-min="0" data-max="45" data-big="5" data-unit="도"><span>오른발을 들 때</span></div>
-  <div class="row" data-k="tl" data-min="0" data-max="45" data-big="5" data-unit="도"><span>왼발을 들 때</span></div>
-
-  <h3>5. 댄스 시험 (한 발로 설 때 엉덩이 각도)</h3>
-  <div class="desc">[왼발 댄스] / [오른발 댄스]로 한쪽씩 따로 시험하고, 한 발로 설 때 반대쪽 발이 잘 들리면서 넘어지지 않도록 각도를 조금씩 바꾸세요. 발이 덜 들리면 90에서 더 멀게 하고, 넘어지면 줄입니다. 왼발 서기는 90보다 크게(90~150), 오른발 서기는 90보다 작게(30~90) 맞춥니다. 서보 보호를 위해 오른쪽 엉덩이(YR)는 135 이하, 왼쪽 엉덩이(YL)는 55 이상으로 자동 제한됩니다. (넘어지기 쉬우니 손으로 받치거나 푹신한 바닥에서 시험하세요.)</div>
-  <h4>왼발 댄스 (왼발로 서서 좌회전 ↔ 우회전)</h4>
-  <div class="btns"><button class="b green" data-act="dl">왼발 댄스</button><button class="b orange" data-act="stop">정지</button></div>
-  <div class="row" data-k="ryr" data-min="0" data-max="135" data-big="5" data-unit="도"><span>오른쪽 엉덩이 (YR)</span></div>
-  <div class="row" data-k="ryl" data-min="55" data-max="180" data-big="5" data-unit="도"><span>왼쪽 엉덩이 (YL)</span></div>
-  <h4>오른발 댄스 (오른발로 서서 좌회전 ↔ 우회전)</h4>
-  <div class="btns"><button class="b green" data-act="dr">오른발 댄스</button><button class="b orange" data-act="stop">정지</button></div>
-  <div class="row" data-k="lyr" data-min="0" data-max="135" data-big="5" data-unit="도"><span>오른쪽 엉덩이 (YR)</span></div>
-  <div class="row" data-k="lyl" data-min="55" data-max="180" data-big="5" data-unit="도"><span>왼쪽 엉덩이 (YL)</span></div>
-
-  <div class="btns" style="margin-top:16px">
-    <button class="b blue" id="calSave">저장 (보드 NVS)</button>
-    <button class="b gray" id="calCopy">값 복사</button>
-    <button class="b red" id="calReset">기본값으로</button>
-  </div>
-  <div id="calNow"></div>
   <div id="calNote">참고: 웹에서 펌웨어를 다시 설치하면 보드의 저장값이 지워지니 [값 복사]로 기록해 두세요.</div>
 </div>
 
@@ -265,29 +247,30 @@ show();
 
 // ── 로봇 맞추기 ─────────────────────────────────────────────
 const ctl = document.getElementById('ctl'), cal = document.getElementById('cal');
-const calState = document.getElementById('calState'), calNow = document.getElementById('calNow');
+const calState = document.getElementById('calState'), calSaved = document.getElementById('calSaved');
 const LOOP_ACTS = ['cr', 'cw', 'dl', 'dr'];   // 정지할 때까지 계속하는 시험 동작
 const ACT_NAME = { p0: '0도 / 180도 자세', p90: '90도 자세', cr: '앞으로 굴리는 중', cw: '걷는 중',
                    dl: '왼발 댄스 중', dr: '오른발 댄스 중', stop: '정지' };
 let cv = {};          // 지금 값 (yl yr rl rr tr tl ryr ryl lyr lyl)
 let calAct = '';      // 지금 하고 있는 시험 동작 ('' 이면 없음)
 let setTimer = null;
+let calStopTimer = null;  // 시간이 정해진 시험 동작(굴리기 3초, 걷기 4초)을 멈추는 타이머
 
-// 슬라이더 줄 만들기: [-큰값] [-1] ──●── [+1] [+큰값]  값
-document.querySelectorAll('.row').forEach(r => {
-  const k = r.dataset.k, big = +r.dataset.big;
-  const step = (t, d) => {
+// 슬라이더 줄 만들기: 이름 [−] ──●── [+] 값   (−/+ 한 번에 data-step 만큼: us 는 5, 도는 1)
+document.querySelectorAll('.row[data-k]').forEach(r => {
+  const k = r.dataset.k, step = +r.dataset.step;
+  const pm = (t, d) => {
     const b = document.createElement('button');
-    b.className = 'st'; b.textContent = t;
+    b.className = 'btn gray'; b.textContent = t;
     b.onclick = () => setVal(k, cv[k] + d);
     return b;
   };
   const rng = document.createElement('input');
-  rng.type = 'range'; rng.min = r.dataset.min; rng.max = r.dataset.max; rng.step = 1; rng.id = 'r-' + k;
+  rng.type = 'range'; rng.min = r.dataset.min; rng.max = r.dataset.max; rng.step = step; rng.id = 'r-' + k;
   rng.oninput = () => setVal(k, +rng.value);
-  const out = document.createElement('b');
-  out.id = 'v-' + k; out.dataset.unit = r.dataset.unit;
-  r.append(step('-' + big, -big), step('-1', -1), rng, step('+1', 1), step('+' + big, big), out);
+  const out = document.createElement('span');
+  out.className = 'num'; out.id = 'v-' + k; out.textContent = '-';
+  r.append(pm('−', -step), rng, pm('+', step), out);
 });
 
 function valText() {
@@ -300,10 +283,8 @@ function showVals() {
     const r = document.getElementById('r-' + k);
     if (!r) continue;
     r.value = cv[k];
-    const o = document.getElementById('v-' + k);
-    o.textContent = cv[k] + ' ' + o.dataset.unit;
+    document.getElementById('v-' + k).textContent = cv[k];
   }
-  calNow.textContent = '현재 값: ' + valText();
 }
 
 // 값 하나를 바꾸고, 0.15초 뒤에 모든 값을 로봇에 보낸다 (슬라이더를 끄는 동안 너무 자주 보내지 않게)
@@ -331,18 +312,22 @@ function loadVals() {
   calState.textContent = '보드의 현재 값을 읽는 중... (응답이 없으면 보드가 켜져 있고 연결됐는지 확인하세요)';
   fetch('/cal/get', { cache: 'no-store' }).then(r => r.json()).then(j => {
     takeVals(j);
+    calSaved.textContent = j.saved ? '저장된 값을 쓰는 중' : '기본값 (저장 안 됨)';
     calState.textContent = j.saved ? '보드에 저장된 값을 불러왔어요.' : '저장된 값이 없어 기본값을 보여 줍니다. 맞춘 뒤 [저장]을 누르세요.';
   }).catch(() => { calState.textContent = '값을 읽지 못했어요. 보드가 켜져 있고 연결됐는지 확인하세요.'; });
 }
 
 // 시험 동작 버튼 (p0 p90 cr cw dl dr stop)
-function calDo(a) {
+// sec 가 있으면 그 시간 동안만 움직이고 스스로 멈춘다 (굴리기 3초, 걷기 4초)
+function calDo(a, sec) {
+  clearTimeout(calStopTimer);
+  if (sec) calStopTimer = setTimeout(() => calDo('stop'), sec * 1000);
   calAct = LOOP_ACTS.includes(a) ? a : '';
   fetch('/move?a=' + a, { cache: 'no-store' })
     .then(() => { calState.textContent = ACT_NAME[a] || ''; })
     .catch(() => { calState.textContent = '로봇과 연결이 끊겼어요'; });
 }
-document.querySelectorAll('[data-act]').forEach(b => b.onclick = () => calDo(b.dataset.act));
+document.querySelectorAll('[data-act]').forEach(b => b.onclick = () => calDo(b.dataset.act, +b.dataset.sec || 0));
 // 시험 동작 중에는 1초마다 "아직 연결돼 있어요" 신호 (끊기면 로봇이 3초 뒤 스스로 멈춤)
 setInterval(() => { if (calAct) fetch('/move?a=' + calAct, { cache: 'no-store' }).catch(() => {}); }, 1000);
 
@@ -360,6 +345,7 @@ document.getElementById('closeCal').onclick = () => {
 
 document.getElementById('calSave').onclick = () => {
   fetch('/cal/save', { cache: 'no-store' }).then(r => r.json()).then(j => {
+    if (j.ok) calSaved.textContent = '저장된 값을 쓰는 중';
     calState.textContent = j.ok ? '✅ 보드에 저장했어요. 다른 프로그램도 ottoInit() 으로 이 값을 씁니다.' : '저장에 실패했어요. 다시 눌러 보세요.';
   }).catch(() => { calState.textContent = '로봇과 연결이 끊겼어요'; });
 };
@@ -383,6 +369,7 @@ document.getElementById('calReset').onclick = () => {
   if (!confirm('보드에 저장된 값을 지우고 기본값으로 되돌릴까요?')) return;
   fetch('/cal/reset', { cache: 'no-store' }).then(r => r.json()).then(j => {
     takeVals(j);
+    calSaved.textContent = '기본값 (저장 안 됨)';
     calState.textContent = '기본값으로 되돌렸어요. (저장된 값은 지웠습니다)';
   }).catch(() => { calState.textContent = '로봇과 연결이 끊겼어요'; });
 };
